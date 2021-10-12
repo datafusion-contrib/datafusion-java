@@ -60,5 +60,3 @@ tasks.register('cargoBuild') {
         }
     }
 }
-
-tasks.named('build') { dependsOn('cargoBuild') }

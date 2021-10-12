@@ -34,7 +34,7 @@ class DefaultExecutionContext implements ExecutionContext {
   }
 
   private RuntimeException getErrorForInvocation(long invocationId) {
-    String errorMessage = errorMessageInbox.get(invocationId);
+    String errorMessage = errorMessageInbox.remove(invocationId);
     assert errorMessage != null : "onErrorMessage was not properly called from JNI";
     return new RuntimeException(errorMessage);
   }
