@@ -1,4 +1,4 @@
-package org.apache.arrow.datafusion.example;
+package org.apache.arrow.datafusion.examples;
 
 import org.apache.arrow.datafusion.DataFrame;
 import org.apache.arrow.datafusion.ExecutionContext;
