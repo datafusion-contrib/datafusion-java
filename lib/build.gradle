@@ -6,24 +6,7 @@
  */
 plugins {
     id 'java-library'
-    id 'idea'
-    id "com.diffplug.spotless" version "5.16.0"
-    id "com.github.johnrengelman.shadow" version "7.1.0"
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-spotless {
-    java {
-        googleJavaFormat()
-    }
-}
-
-repositories {
-    mavenCentral()
+    id 'datafusion.java-conventions'
 }
 
 dependencies {
@@ -54,7 +37,7 @@ tasks.register('cargoBuild') {
 
     doLast {
         exec {
-            workingDir "${workingDir}/datafusion_jni"
+            workingDir "${workingDir}/../datafusion_jni"
             executable 'cargo'
             args 'build'
         }

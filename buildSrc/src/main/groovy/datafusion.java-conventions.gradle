@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.apache.arrow.datafusion'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
