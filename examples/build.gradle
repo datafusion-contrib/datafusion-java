@@ -1,7 +1,14 @@
 plugins {
     id 'application'
     id 'datafusion.java-conventions'
+    id 'com.diffplug.spotless'
     id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
 }
 
 dependencies {

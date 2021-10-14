@@ -1,0 +1,10 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'com.diffplug.spotless' version '5.17.0' apply false
+}
