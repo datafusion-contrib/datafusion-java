@@ -7,5 +7,12 @@
  * in the user manual at https://docs.gradle.org/7.2/userguide/multi_project_builds.html
  */
 
+pluginManagement {
+    plugins {
+        id 'com.diffplug.spotless' version "5.17.0"
+    }
+}
+
 rootProject.name = 'datafusion_java'
 include 'lib', 'examples'
+
