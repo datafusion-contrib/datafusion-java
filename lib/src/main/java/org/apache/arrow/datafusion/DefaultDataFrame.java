@@ -1,5 +1,6 @@
 package org.apache.arrow.datafusion;
 
+import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.vector.ipc.ArrowReader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -27,5 +28,10 @@ class DefaultDataFrame implements DataFrame, AutoCloseable {
   @Override
   public ArrowReader getReader() {
     throw new UnsupportedOperationException("not implemented");
+  }
+
+  @Override
+  public CompletableFuture<Void> show() {
+    throw new UnsupportedOperationException("show not implemented");
   }
 }
