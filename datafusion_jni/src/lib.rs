@@ -1,22 +1,44 @@
 // This is the interface to the JVM that we'll
 // call the majority of our methods on.
 use jni::JNIEnv;
-
 // These objects are what you should use as arguments to your native function.
 // They carry extra lifetime information to prevent them escaping this context
 // and getting used after being GC'd.
 use jni::objects::{GlobalRef, JClass, JObject, JString};
-
 // This is just a pointer. We'll be returning it from our function.
 // We can't return one of the objects with lifetime information because the
 // lifetime checker won't let us.
-use jni::sys::{jbyteArray, jint, jlong, jstring};
-
-use std::{sync::mpsc, thread, time::Duration};
-
 use datafusion::dataframe::DataFrame;
 use datafusion::execution::context::{ExecutionConfig, ExecutionContext};
+use jni::sys::{jbyteArray, jint, jlong, jstring};
 use std::sync::Arc;
+use std::{sync::mpsc, thread, time::Duration};
+use tokio::runtime::Runtime;
+
+#[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_TokioRuntime_createTokioRuntime(
+    _env: JNIEnv,
+    _class: JClass,
+) -> jlong {
+    if let Ok(runtime) = Runtime::new() {
+        println!("successfully created tokio runtime");
+        Box::into_raw(Box::new(runtime)) as jlong
+    } else {
+        // TODO error handling
+        -1
+    }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_TokioRuntime_destroyTokioRuntime(
+    _env: JNIEnv,
+    _class: JClass,
+    pointer: jlong,
+) {
+    let runtime = unsafe { Box::from_raw(pointer as *mut Runtime) };
+    runtime.shutdown_timeout(Duration::from_millis(100));
+    println!("successfully shutdown tokio runtime");
+}
 
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_querySql(

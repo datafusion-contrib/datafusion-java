@@ -1,6 +1,6 @@
 package org.apache.arrow.datafusion;
 
-class DataFrames {
+final class DataFrames {
 
   private DataFrames() {}
 

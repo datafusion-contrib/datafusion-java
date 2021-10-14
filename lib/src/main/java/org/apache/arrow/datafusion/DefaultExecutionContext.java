@@ -33,6 +33,11 @@ class DefaultExecutionContext implements ExecutionContext {
     }
   }
 
+  @Override
+  public Runtime getRuntime() {
+    return runtime;
+  }
+
   private RuntimeException getErrorForInvocation(long invocationId) {
     String errorMessage = errorMessageInbox.remove(invocationId);
     assert errorMessage != null : "onErrorMessage was not properly called from JNI";
@@ -44,17 +49,20 @@ class DefaultExecutionContext implements ExecutionContext {
     for (DefaultDataFrame frame : dataFrames.values()) {
       frame.close();
     }
+    runtime.close();
     logger.printf(Level.INFO, "closing %x", pointer);
     ExecutionContexts.destroyExecutionContext(pointer);
   }
 
   private final long pointer;
+  private final Runtime runtime;
   private final ConcurrentMap<Long, String> errorMessageInbox;
   private final ConcurrentMap<Long, DefaultDataFrame> dataFrames;
 
   DefaultExecutionContext(long pointer) {
     logger.printf(Level.INFO, "obtaining %x", pointer);
     this.pointer = pointer;
+    this.runtime = Runtime.create();
     this.errorMessageInbox = new ConcurrentHashMap<>();
     this.dataFrames = new ConcurrentHashMap<>();
   }
