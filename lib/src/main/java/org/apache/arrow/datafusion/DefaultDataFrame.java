@@ -2,27 +2,14 @@ package org.apache.arrow.datafusion;
 
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.vector.ipc.ArrowReader;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-class DefaultDataFrame implements DataFrame, AutoCloseable {
-
-  private static final Logger logger = LogManager.getLogger(DefaultDataFrame.class);
+class DefaultDataFrame extends AbstractProxy implements DataFrame {
 
   private final ExecutionContext context;
-  private final long pointer;
 
   DefaultDataFrame(ExecutionContext context, long pointer) {
+    super(pointer);
     this.context = context;
-    logger.printf(Level.INFO, "obtaining %x", pointer);
-    this.pointer = pointer;
-  }
-
-  @Override
-  public void close() throws Exception {
-    logger.printf(Level.INFO, "closing %x", pointer);
-    DataFrames.destroyDataFrame(pointer);
   }
 
   @Override
@@ -33,5 +20,10 @@ class DefaultDataFrame implements DataFrame, AutoCloseable {
   @Override
   public CompletableFuture<Void> show() {
     throw new UnsupportedOperationException("show not implemented");
+  }
+
+  @Override
+  void doClose(long pointer) {
+    DataFrames.destroyDataFrame(pointer);
   }
 }
