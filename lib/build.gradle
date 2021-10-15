@@ -40,8 +40,6 @@ task generateJniHeaders(type: JavaCompile) {
 }
 
 tasks.register('cargoBuild') {
-    dependsOn('generateJniHeaders')
-
     doLast {
         exec {
             workingDir "${workingDir}/../datafusion_jni"
