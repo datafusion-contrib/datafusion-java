@@ -19,7 +19,22 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
 
   @Override
   public CompletableFuture<Void> show() {
-    throw new UnsupportedOperationException("show not implemented");
+    Runtime runtime = context.getRuntime();
+    long runtimePointer = runtime.getPointer();
+    long dataframe = getPointer();
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    DataFrames.showDataframe(
+        runtimePointer,
+        dataframe,
+        (String errString) -> {
+          if (errString != null && !"".equals(errString)) {
+            future.completeExceptionally(new RuntimeException(errString));
+          } else {
+            future.complete(null);
+          }
+          return /*void*/ null;
+        });
+    return future;
   }
 
   @Override

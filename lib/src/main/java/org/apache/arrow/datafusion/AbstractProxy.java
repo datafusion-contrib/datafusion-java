@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-abstract class AbstractProxy implements AutoCloseable {
+abstract class AbstractProxy implements AutoCloseable, NativeProxy {
   private static final Logger logger = LogManager.getLogger(AbstractProxy.class);
   private final long pointer;
   private final AtomicBoolean closed;
@@ -31,7 +31,8 @@ abstract class AbstractProxy implements AutoCloseable {
     return closed.get();
   }
 
-  protected final long getPointer() {
+  @Override
+  public final long getPointer() {
     return pointer;
   }
 

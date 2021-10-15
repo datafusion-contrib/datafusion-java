@@ -10,6 +10,7 @@ use jni::objects::{GlobalRef, JClass, JObject, JString};
 // lifetime checker won't let us.
 use datafusion::dataframe::DataFrame;
 use datafusion::execution::context::{ExecutionConfig, ExecutionContext};
+use datafusion::prelude::*;
 use jni::sys::{jbyteArray, jint, jlong, jstring};
 use std::sync::Arc;
 use std::{sync::mpsc, thread, time::Duration};
@@ -89,6 +90,32 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_ExecutionContexts_create
 ) -> jlong {
     let context = ExecutionContext::new();
     Box::into_raw(Box::new(context)) as jlong
+}
+
+#[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe(
+    env: JNIEnv,
+    _class: JClass,
+    runtime: jlong,
+    dataframe: jlong,
+    callback: JObject,
+) {
+    let runtime = unsafe { &mut *(runtime as *mut Runtime) };
+    let dataframe = unsafe { &mut *(dataframe as *mut Arc<dyn DataFrame>) };
+    runtime.block_on(async {
+        // TODO this is only added in Datafusion 6.0
+        // dataframe.show().await;
+        let err_message = env
+            .new_string("".to_string())
+            .expect("Couldn't create java string!");
+        env.call_method(
+            callback,
+            "apply",
+            "(Ljava/lang/Object;)Ljava/lang/Object;",
+            &[err_message.into()],
+        )
+        .unwrap();
+    });
 }
 
 #[no_mangle]

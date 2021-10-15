@@ -21,6 +21,8 @@ public class ExampleMain {
 
       dataFrame = context.sql("select cos(2.0)");
       logger.printf(Level.INFO, "successfully loaded data frame %s", dataFrame);
+
+      dataFrame.show().thenRun(() -> logger.info("show was run successfully"));
     }
   }
 }
