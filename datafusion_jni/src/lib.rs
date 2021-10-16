@@ -1,17 +1,13 @@
-// This is the interface to the JVM that we'll
-// call the majority of our methods on.
-use jni::JNIEnv;
-// These objects are what you should use as arguments to your native function.
-// They carry extra lifetime information to prevent them escaping this context
-// and getting used after being GC'd.
-use jni::objects::{GlobalRef, JClass, JObject, JString};
-// This is just a pointer. We'll be returning it from our function.
-// We can't return one of the objects with lifetime information because the
-// lifetime checker won't let us.
+use arrow::ipc::writer::FileWriter;
 use datafusion::dataframe::DataFrame;
 use datafusion::execution::context::{ExecutionConfig, ExecutionContext};
 use datafusion::prelude::*;
+use jni::objects::{GlobalRef, JClass, JObject, JString};
 use jni::sys::{jbyteArray, jint, jlong, jstring};
+use jni::JNIEnv;
+use std::convert::Into;
+use std::io::BufWriter;
+use std::io::Cursor;
 use std::sync::Arc;
 use std::{sync::mpsc, thread, time::Duration};
 use tokio::runtime::Runtime;
@@ -102,25 +98,34 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDatafr
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let dataframe = unsafe { &mut *(dataframe as *mut Arc<dyn DataFrame>) };
+    let schema = dataframe.schema().into();
     runtime.block_on(async {
-        // dataframe.show().await;
+        let batches = dataframe
+            .collect()
+            .await
+            .expect("failed to collect dataframe");
+        let mut buff = Cursor::new(vec![0; 0]);
+        {
+            let mut writer = FileWriter::try_new(BufWriter::new(&mut buff), &schema)
+                .expect("failed to create writer");
+            for batch in batches {
+                writer.write(&batch).expect("failed to write batch");
+            }
+            writer.finish().expect("failed to finish");
+        }
         let err_message = env
             .new_string("".to_string())
             .expect("Couldn't create java string!");
         let ba = env
-            .byte_array_from_slice(b"hello")
+            .byte_array_from_slice(&buff.get_ref())
             .expect("cannot create empty byte array");
-        let ba_class = env.get_object_class(ba).expect("cannot get object class");
-        let arr = env
-            .new_object_array(5, ba_class, ba)
-            .expect("cannot create object array");
         env.call_method(
             callback,
             "apply",
             "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-            &[err_message.into(), arr.into()],
+            &[err_message.into(), ba.into()],
         )
-        .unwrap();
+        .expect("failed to call method");
     });
 }
 

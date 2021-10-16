@@ -1,10 +1,13 @@
 package org.apache.arrow.datafusion;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.ipc.ArrowFileReader;
 import org.apache.arrow.vector.ipc.message.ArrowRecordBatch;
+import org.apache.arrow.vector.types.pojo.Schema;
+import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,15 +30,25 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
     DataFrames.collectDataframe(
         runtimePointer,
         dataframe,
-        (String errString, Object[] arr) -> {
+        (String errString, byte[] arr) -> {
           if (errString != null && !"".equals(errString)) {
             result.completeExceptionally(new RuntimeException(errString));
           } else {
-            logger.info("successfully completed with {} arr", arr.length);
-//            for (Object x : arr) {
-//              byte[] bytes = (byte[]) x;
-//              logger.info("array element {}", new String(bytes, StandardCharsets.UTF_8));
-//            }
+            logger.info("successfully completed with arr length={}", arr.length);
+            logger.info("begin to decode");
+            try (RootAllocator allocator = new RootAllocator(Long.MAX_VALUE);
+                ByteArrayReadableSeekableByteChannel byteChannel =
+                    new ByteArrayReadableSeekableByteChannel(arr);
+                ArrowFileReader reader = new ArrowFileReader(byteChannel, allocator)) {
+              logger.info("reader {}", reader);
+              Schema schema = reader.getVectorSchemaRoot().getSchema();
+              logger.info("schema {}", schema);
+            } catch (IOException e) {
+              logger.warn("failed to read", e);
+            } catch (Exception e) {
+              System.out.println(e);
+              logger.warn("unexpected exception", e);
+            }
             result.complete(null);
           }
           return /*void*/ null;
