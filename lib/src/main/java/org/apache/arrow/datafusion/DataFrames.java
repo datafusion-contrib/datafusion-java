@@ -12,5 +12,5 @@ final class DataFrames {
   static native void showDataframe(long runtime, long dataframe, Function<String, Void> callback);
 
   static native void collectDataframe(
-      long runtime, long dataframe, BiFunction<String, Object[], Void> callback);
+      long runtime, long dataframe, BiFunction<String, byte[], Void> callback);
 }
