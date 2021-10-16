@@ -93,6 +93,38 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_ExecutionContexts_create
 }
 
 #[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDataframe(
+    env: JNIEnv,
+    _class: JClass,
+    runtime: jlong,
+    dataframe: jlong,
+    callback: JObject,
+) {
+    let runtime = unsafe { &mut *(runtime as *mut Runtime) };
+    let dataframe = unsafe { &mut *(dataframe as *mut Arc<dyn DataFrame>) };
+    runtime.block_on(async {
+        // dataframe.show().await;
+        let err_message = env
+            .new_string("".to_string())
+            .expect("Couldn't create java string!");
+        let ba = env
+            .byte_array_from_slice(b"hello")
+            .expect("cannot create empty byte array");
+        let ba_class = env.get_object_class(ba).expect("cannot get object class");
+        let arr = env
+            .new_object_array(5, ba_class, ba)
+            .expect("cannot create object array");
+        env.call_method(
+            callback,
+            "apply",
+            "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+            &[err_message.into(), arr.into()],
+        )
+        .unwrap();
+    });
+}
+
+#[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe(
     env: JNIEnv,
     _class: JClass,
