@@ -3,6 +3,7 @@ package org.apache.arrow.datafusion;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/** helper class that calls into native stack for {@link DataFrame} */
 final class DataFrames {
 
   private DataFrames() {}
