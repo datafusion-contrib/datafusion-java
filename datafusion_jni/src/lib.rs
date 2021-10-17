@@ -121,8 +121,8 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDatafr
             .expect("cannot create empty byte array");
         env.call_method(
             callback,
-            "apply",
-            "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+            "accept",
+            "(Ljava/lang/Object;Ljava/lang/Object;)V",
             &[err_message.into(), ba.into()],
         )
         .expect("failed to call method");
@@ -147,8 +147,8 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe
             .expect("Couldn't create java string!");
         env.call_method(
             callback,
-            "apply",
-            "(Ljava/lang/Object;)Ljava/lang/Object;",
+            "accept",
+            "(Ljava/lang/Object;)V",
             &[err_message.into()],
         )
         .unwrap();

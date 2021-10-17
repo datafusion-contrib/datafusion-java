@@ -36,7 +36,6 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
                 new ByteArrayReadableSeekableByteChannel(arr);
             result.complete(new ArrowFileReader(byteChannel, allocator));
           }
-          return /*void*/ null;
         });
     return result;
   }
@@ -60,7 +59,6 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
           } else {
             future.complete(null);
           }
-          return /*void*/ null;
         });
     return future;
   }
