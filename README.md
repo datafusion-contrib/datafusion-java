@@ -8,6 +8,11 @@ A Java binding to [Apache Arrow Datafusion][1]
 
 This project is still work in progress. Please check back later.
 
+## Built Artifact
+
+1. Checkout the [release page](https://github.com/Jimexist/datafusion-java/releases) for a pre-built MacOS JNI library.
+1. Checkout the [GitHub maven repository](https://github.com/Jimexist/datafusion-java/packages/1047809) for installing the Java artifacts.
+
 ## How to run
 
 Run the example in one line
