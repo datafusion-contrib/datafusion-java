@@ -24,9 +24,9 @@ java {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        gpr(MavenPublication) {
             artifactId = 'datafusion-java'
-            from components.java
+            from(components.java)
             pom {
                 name = 'Datafuion Java'
                 description = 'A Java binding to Apache Arrow Datafusion library'
@@ -42,10 +42,12 @@ publishing {
     }
     repositories {
         maven {
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
-            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Jimexist/datafusion_java")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }

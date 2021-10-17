@@ -15,6 +15,9 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: "adopt"
 
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
