@@ -4,6 +4,12 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.ipc.ArrowReader;
 
+/**
+ * A dataframe is a rectangle shaped data that holds columns and rows, and can be {@link
+ * #collect(BufferAllocator) collected} into {@link
+ * org.apache.arrow.vector.ipc.message.ArrowRecordBatch batches} and read via {@link ArrowReader
+ * reader}.
+ */
 public interface DataFrame extends NativeProxy {
   /**
    * Collect dataframe into a list of record batches

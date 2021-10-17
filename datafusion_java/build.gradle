@@ -6,6 +6,7 @@
  */
 plugins {
     id 'java-library'
+    id 'maven-publish'
     id 'datafusion.java-conventions'
     id 'com.diffplug.spotless'
 }
@@ -13,6 +14,45 @@ plugins {
 spotless {
     java {
         googleJavaFormat()
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'datafusion-java'
+            from components.java
+            pom {
+                name = 'Datafuion Java'
+                description = 'A Java binding to Apache Arrow Datafusion library'
+                url = 'https://github.com/Jimexist/datafusion-java'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
+            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
     }
 }
 
