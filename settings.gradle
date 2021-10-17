@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'datafusion_java'
-include 'lib', 'examples'
+include 'datafusion_java', 'datafusion_examples'
