@@ -62,3 +62,4 @@ gradle-app.setting
 .settings/
 
 .idea/
+out/
