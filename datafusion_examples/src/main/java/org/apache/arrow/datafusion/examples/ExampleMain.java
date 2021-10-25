@@ -9,9 +9,9 @@ import org.apache.arrow.datafusion.ExecutionContexts;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.BigIntVector;
-import org.apache.arrow.vector.Float8Vector;
 import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.ipc.ArrowReader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,78 +23,55 @@ public class ExampleMain {
   public static void main(String[] args) throws Exception {
     try (ExecutionContext context = ExecutionContexts.create();
         BufferAllocator allocator = new RootAllocator()) {
-      context
-          .sql("select 1 + 2")
-          .thenAccept(
-              dataFrame ->
-                  logger.printf(Level.INFO, "successfully loaded data frame %s", dataFrame))
-          .join();
-      context
-          .sql("select 2")
-          .thenAccept(
-              dataFrame ->
-                  logger.printf(Level.INFO, "successfully loaded data frame %s", dataFrame))
-          .join();
-      CompletableFuture<DataFrame> future = context.sql("select cos(2.0)");
-      future
-          .thenComposeAsync(
-              dataFrame -> {
-                logger.printf(Level.INFO, "successfully loaded data frame %s", dataFrame);
-                return dataFrame.show();
-              })
-          .thenRun(() -> logger.info("show was run successfully"))
-          .join();
-      future
-          .thenComposeAsync(df -> df.collect(allocator))
-          .thenAccept(
-              reader -> {
-                try {
-                  VectorSchemaRoot root = reader.getVectorSchemaRoot();
-                  while (reader.loadNextBatch()) {
-                    Float8Vector result = (Float8Vector) root.getVector(0);
-                    logger.info(
-                        "name vector size {}, row count {}, value={}",
-                        result.getValueCount(),
-                        root.getRowCount(),
-                        result);
-                  }
-                  reader.close();
-                } catch (IOException e) {
-                  logger.warn("got IO Exception", e);
-                }
-              })
-          .join();
+      loadConstant(context).join();
 
       context.registerCsv("test_csv", Paths.get("src/main/resources/test_table.csv")).join();
-      context.sql("select * from test_csv").thenComposeAsync(DataFrame::show).join();
+      context.sql("select * from test_csv limit 3").thenComposeAsync(DataFrame::show).join();
+
+      context
+          .registerParquet(
+              "test_parquet", Paths.get("src/main/resources/aggregate_test_100.parquet"))
+          .join();
+      context.sql("select * from test_parquet limit 3").thenComposeAsync(DataFrame::show).join();
 
       context
           .sql("select * from test_csv")
           .thenComposeAsync(df -> df.collect(allocator))
-          .thenAccept(
-              reader -> {
-                try {
-                  VectorSchemaRoot root = reader.getVectorSchemaRoot();
-                  while (reader.loadNextBatch()) {
-                    VarCharVector nameVector = (VarCharVector) root.getVector(0);
-                    logger.info(
-                        "name vector size {}, row count {}, value={}",
-                        nameVector.getValueCount(),
-                        root.getRowCount(),
-                        nameVector);
-                    BigIntVector ageVector = (BigIntVector) root.getVector(1);
-                    logger.info(
-                        "age vector size {}, row count {}, value={}",
-                        ageVector.getValueCount(),
-                        root.getRowCount(),
-                        ageVector);
-                  }
-                  reader.close();
-                } catch (IOException e) {
-                  logger.warn("got IO Exception", e);
-                }
-              })
+          .thenAccept(ExampleMain::consumeReader)
           .join();
     }
+  }
+
+  private static void consumeReader(ArrowReader reader) {
+    try {
+      VectorSchemaRoot root = reader.getVectorSchemaRoot();
+      while (reader.loadNextBatch()) {
+        VarCharVector nameVector = (VarCharVector) root.getVector(0);
+        logger.info(
+            "name vector size {}, row count {}, value={}",
+            nameVector.getValueCount(),
+            root.getRowCount(),
+            nameVector);
+        BigIntVector ageVector = (BigIntVector) root.getVector(1);
+        logger.info(
+            "age vector size {}, row count {}, value={}",
+            ageVector.getValueCount(),
+            root.getRowCount(),
+            ageVector);
+      }
+      reader.close();
+    } catch (IOException e) {
+      logger.warn("got IO Exception", e);
+    }
+  }
+
+  private static CompletableFuture<Void> loadConstant(ExecutionContext context) {
+    return context
+        .sql("select 1 + 2")
+        .thenComposeAsync(
+            dataFrame -> {
+              logger.printf(Level.INFO, "successfully loaded data frame %s", dataFrame);
+              return dataFrame.show();
+            });
   }
 }
