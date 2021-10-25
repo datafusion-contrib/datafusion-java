@@ -7,13 +7,13 @@ authors = ["Apache Arrow <dev@arrow.apache.org>"]
 description = "Build and run queries against data"
 readme = "README.md"
 license = "Apache-2.0"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-jni = "0.19.0"
-tokio = "1.12.0"
-arrow = "^5.5.0"
-datafusion = "^5.0.0"
+jni = "^0.19.0"
+tokio = "^1.12.0"
+arrow = "^6.0.0"
+datafusion = { git = "https://github.com/apache/arrow-datafusion" }
 
 [lib]
 crate_type = ["cdylib"]
