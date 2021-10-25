@@ -66,37 +66,10 @@ public class ExampleMain {
           .join();
 
       context.registerCsv("test_csv", Paths.get("src/main/resources/test_table.csv")).join();
+      context.sql("select * from test_csv").thenComposeAsync(DataFrame::show).join();
+
       context
           .sql("select * from test_csv")
-          .thenComposeAsync(df -> df.collect(allocator))
-          .thenAccept(
-              reader -> {
-                try {
-                  VectorSchemaRoot root = reader.getVectorSchemaRoot();
-                  while (reader.loadNextBatch()) {
-                    VarCharVector nameVector = (VarCharVector) root.getVector(0);
-                    logger.info(
-                        "name vector size {}, row count {}, value={}",
-                        nameVector.getValueCount(),
-                        root.getRowCount(),
-                        nameVector);
-                    BigIntVector ageVector = (BigIntVector) root.getVector(1);
-                    logger.info(
-                        "age vector size {}, row count {}, value={}",
-                        ageVector.getValueCount(),
-                        root.getRowCount(),
-                        ageVector);
-                  }
-                  reader.close();
-                } catch (IOException e) {
-                  logger.warn("got IO Exception", e);
-                }
-              })
-          .join();
-
-      context.registerParquet("test_parquet", Paths.get("src/main/resources/blogs.parquet")).join();
-      context
-          .sql("select * from test_parquet")
           .thenComposeAsync(df -> df.collect(allocator))
           .thenAccept(
               reader -> {
