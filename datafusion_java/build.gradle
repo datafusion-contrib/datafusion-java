@@ -30,7 +30,7 @@ publishing {
             pom {
                 name = 'Datafuion Java'
                 description = 'A Java binding to Apache Arrow Datafusion library'
-                url = 'https://github.com/Jimexist/datafusion-java'
+                url = 'https://github.com/datafusion-contrib/datafusion-java'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -43,7 +43,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Jimexist/datafusion-java")
+            url = uri("https://github.com/datafusion-contrib/datafusion-java")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
@@ -62,11 +62,11 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-format
-    implementation 'org.apache.arrow:arrow-format:5.0.0'
+    implementation 'org.apache.arrow:arrow-format:6.0.0'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-vector
-    implementation 'org.apache.arrow:arrow-vector:5.0.0'
+    implementation 'org.apache.arrow:arrow-vector:6.0.0'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-netty
-    runtimeOnly 'org.apache.arrow:arrow-memory-netty:5.0.0'
+    runtimeOnly 'org.apache.arrow:arrow-memory-netty:6.0.0'
 }
 
 task generateJniHeaders(type: JavaCompile) {
