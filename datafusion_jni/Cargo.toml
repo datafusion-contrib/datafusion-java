@@ -13,7 +13,7 @@ edition = "2021"
 jni = "^0.19.0"
 tokio = "^1.12.0"
 arrow = "^6.0.0"
-datafusion = { git = "https://github.com/apache/arrow-datafusion" }
+datafusion = { git = "https://github.com/apache/arrow-datafusion", tag = "6.0.0-rc0" }
 
 [lib]
 crate_type = ["cdylib"]

@@ -1,4 +1,4 @@
-FROM openjdk:11.0.12-jdk-bullseye AS builder
+FROM openjdk:11-jdk-bullseye AS builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -18,11 +18,12 @@ RUN cd datafusion_jni && cargo build --release && cd ..
 
 RUN ./gradlew build
 
-FROM openjdk:11.0.12-jdk-slim-bullseye
+FROM openjdk:11-jdk-slim-bullseye
 
 WORKDIR /usr/opt/datafusion_java
 
 COPY --from=builder /usr/opt/datafusion_java/datafusion_examples/build/libs/datafusion_examples-1.0-all.jar ./
+
 COPY --from=builder /usr/opt/datafusion_java/datafusion_jni/target/release/libdatafusion_jni.so ./
 
 CMD ["--class-path", "/usr/opt/datafusion_java/datafusion_examples-1.0-all.jar", "-R", "-Djava.library.path=/usr/opt/datafusion_java"]
