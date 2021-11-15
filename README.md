@@ -6,11 +6,13 @@ A Java binding to [Apache Arrow Datafusion][1]
 
 ## Status
 
-This project is still work in progress. Please check back later.
+This project is still work in progress, and currently it works with Arrow 6.0 and Datafusion 6.0 version.
+It is build and verified in CI against Java 8, 11, and 15. You may checkout the docker run instructions
+where Java 11 `jshell` is used to run interactively.
 
 ## How to run
 
-### 1. Run using Docker
+### 1. Run using Docker (with `jshell`)
 
 First build the docker image:
 
@@ -19,29 +21,37 @@ docker build -t datafusion-java .
 ```
 
 ```text
-[+] Building 276.7s (17/17) FINISHED
+❯ docker build -t datafusion-java .
+[+] Building 101.2s (24/24) FINISHED
  => [internal] load build definition from Dockerfile                                                     0.0s
- => => transferring dockerfile: 890B                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                      0.0s
  => [internal] load .dockerignore                                                                        0.0s
- => => transferring context: 2B                                                                          0.0s
- => [internal] load metadata for docker.io/library/openjdk:11.0.12-jdk-slim-bullseye                     1.4s
- => [internal] load metadata for docker.io/library/openjdk:11.0.12-jdk-bullseye                          1.4s
- => [internal] load build context                                                                        0.6s
- => => transferring context: 1.06MB                                                                      0.6s
- => [builder 1/7] FROM docker.io/library/openjdk:11.0.12-jdk-bullseye@sha256:7d7c3de8d1231e8910d163a6b3  0.0s
- => [stage-1 1/4] FROM docker.io/library/openjdk:11.0.12-jdk-slim-bullseye@sha256:e7cb0867beb749222b109  0.0s
- => CACHED [builder 2/7] RUN apt-get update &&   apt-get -y install gcc &&   rm -rf /var/lib/apt/lists/  0.0s
- => CACHED [builder 3/7] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y     0.0s
- => CACHED [builder 4/7] WORKDIR /usr/opt/datafusion_java                                                0.0s
- => [builder 5/7] COPY . .                                                                               5.6s
- => [builder 6/7] RUN cd datafusion_jni && cargo build --release && cd ..                              179.3s
- => [builder 7/7] RUN ./gradlew build                                                                   89.0s
- => CACHED [stage-1 2/4] WORKDIR /usr/opt/datafusion_java                                                0.0s
- => CACHED [stage-1 3/4] COPY --from=builder /usr/opt/datafusion_java/datafusion_examples/build/libs/da  0.0s
- => [stage-1 4/4] COPY --from=builder /usr/opt/datafusion_java/datafusion_jni/target/release/libdatafus  0.1s
+ => => transferring context: 34B                                                                         0.0s
+ => [internal] load metadata for docker.io/library/openjdk:11-jdk-slim-bullseye                          1.6s
+ => [internal] load metadata for docker.io/library/debian:bullseye                                       0.0s
+ => [internal] load metadata for docker.io/library/openjdk:11-jdk-bullseye                               1.7s
+ => [stage-2 1/4] FROM docker.io/library/openjdk:11-jdk-slim-bullseye@sha256:ad41c90d47fdc84fecb3bdba2d  0.0s
+ => [internal] load build context                                                                        0.4s
+ => => transferring context: 714.37kB                                                                    0.4s
+ => [java-builder 1/7] FROM docker.io/library/openjdk:11-jdk-bullseye@sha256:81cce461e2ac37d6f557f57ff8  0.0s
+ => [rust-builder 1/6] FROM docker.io/library/debian:bullseye                                            0.0s
+ => CACHED [java-builder 2/7] WORKDIR /usr/opt/datafusion_java                                           0.0s
+ => CACHED [java-builder 3/7] COPY build.gradle settings.gradle gradlew ./                               0.0s
+ => CACHED [java-builder 4/7] COPY gradle gradle                                                         0.0s
+ => CACHED [java-builder 5/7] RUN ./gradlew --version                                                    0.0s
+ => [java-builder 6/7] COPY . .                                                                          4.2s
+ => [java-builder 7/7] RUN ./gradlew shadowJar                                                          94.6s
+ => CACHED [stage-2 2/4] WORKDIR /usr/opt/datafusion_java                                                0.0s
+ => CACHED [rust-builder 2/6] RUN apt-get update &&   apt-get -y install curl gcc &&   rm -rf /var/lib/  0.0s
+ => CACHED [rust-builder 3/6] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s --   0.0s
+ => CACHED [rust-builder 4/6] COPY datafusion_jni /usr/opt/datafusion_jni                                0.0s
+ => CACHED [rust-builder 5/6] WORKDIR /usr/opt/datafusion_jni                                            0.0s
+ => CACHED [rust-builder 6/6] RUN cargo build --release                                                  0.0s
+ => CACHED [stage-2 3/4] COPY --from=rust-builder /usr/opt/datafusion_jni/target/release/libdatafusion_  0.0s
+ => [stage-2 4/4] COPY --from=java-builder /usr/opt/datafusion_java/datafusion_examples/build/libs/data  0.0s
  => exporting to image                                                                                   0.1s
  => => exporting layers                                                                                  0.1s
- => => writing image sha256:4fee2427d99ef049d669a632fc49b399cea4d1ea214a14a010916648c12085ef             0.0s
+ => => writing image sha256:deacd5b3bd1ceba2c0ae0060e49bb148e2468fd355870657679a3566abb725de             0.0s
  => => naming to docker.io/library/datafusion-java                                                       0.0s
 ```
 
@@ -64,7 +74,7 @@ jshell> var context = ExecutionContexts.create()
 11:27:52.558 [main] INFO  org.apache.arrow.datafusion.AbstractProxy - Obtaining TokioRuntime@7fee744d0680
 context ==> org.apache.arrow.datafusion.DefaultExecutionContext@6babf3bf
 
-jshell> var df = context.sql("select 1.1 + cos(2.0)")
+jshell> var df = context.sql("select 1.1 + cos(2.0)").join()
 11:28:43.573 [main] INFO  org.apache.arrow.datafusion.AbstractProxy - Obtaining DefaultDataFrame@7fee74140890
 df ==> org.apache.arrow.datafusion.DefaultDataFrame@10feca44
 
