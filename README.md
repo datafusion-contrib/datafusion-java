@@ -1,13 +1,13 @@
 # datafusion-java
 
-[![Java CI](https://github.com/Jimexist/datafusion-java/actions/workflows/java.yml/badge.svg)](https://github.com/Jimexist/datafusion-java/actions/workflows/java.yml) [![Rust CI](https://github.com/Jimexist/datafusion-java/actions/workflows/rust.yml/badge.svg)](https://github.com/Jimexist/datafusion-java/actions/workflows/rust.yml)
+[![Java CI](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/java.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/java.yml) [![Rust CI](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/rust.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/rust.yml)
 
 A Java binding to [Apache Arrow Datafusion][1]
 
 ## Status
 
 This project is still work in progress, and currently it works with Arrow 6.0 and Datafusion 6.0 version.
-It is build and verified in CI against Java 8, 11, and 15. You may checkout the docker run instructions
+It is build and verified in CI against Java 8, 11, and 15. You may check out the docker run instructions
 where Java 11 `jshell` is used to run interactively.
 
 ## How to run
@@ -104,8 +104,8 @@ v ==> [0.6838531634528577]
 
 ### 2. Using pre-built artifact
 
-1. Checkout the [release page](https://github.com/Jimexist/datafusion-java/releases) for a pre-built MacOS JNI library.
-1. Checkout the [GitHub maven repository](https://github.com/Jimexist/datafusion-java/packages/1047809) for installing the Java artifacts.
+1. Checkout the [release page](https://github.com/datafusion-contrib/datafusion-java/releases) for a pre-built MacOS JNI library.
+1. Checkout the [GitHub maven repository](https://github.com/datafusion-contrib/datafusion-java/packages/1047809) for installing the Java artifacts.
 
 ### 3. Build from source
 
