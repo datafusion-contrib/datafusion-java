@@ -28,7 +28,7 @@ publishing {
             artifactId = 'datafusion-java'
             from(components.java)
             pom {
-                name = 'Datafuion Java'
+                name = 'Datafusion Java'
                 description = 'A Java binding to Apache Arrow Datafusion library'
                 url = 'https://github.com/datafusion-contrib/datafusion-java'
                 licenses {
