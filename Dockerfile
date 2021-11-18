@@ -39,8 +39,8 @@ WORKDIR /usr/opt/datafusion_java
 
 COPY --from=rust-builder /usr/opt/datafusion_jni/target/release/libdatafusion_jni.so ./
 
-COPY --from=java-builder /usr/opt/datafusion_java/datafusion_examples/build/libs/datafusion_examples-0.4-all.jar ./
+COPY --from=java-builder /usr/opt/datafusion_java/datafusion_examples/build/libs/datafusion_examples-0.5-all.jar ./
 
-CMD ["--class-path", "/usr/opt/datafusion_java/datafusion_examples-0.4-all.jar", "-R", "-Djava.library.path=/usr/opt/datafusion_java"]
+CMD ["--class-path", "/usr/opt/datafusion_java/datafusion_examples-0.5-all.jar", "-R", "-Djava.library.path=/usr/opt/datafusion_java"]
 
 ENTRYPOINT ["jshell"]
