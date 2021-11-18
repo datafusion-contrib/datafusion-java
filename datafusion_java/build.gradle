@@ -43,7 +43,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://github.com/datafusion-contrib/datafusion-java")
+            url = uri("https://maven.pkg.github.com/datafusion-contrib/datafusion-java")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
