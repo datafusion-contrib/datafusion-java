@@ -1,5 +1,6 @@
 build/
 target/
 out/
+bin/
 .idea/
 .gradle/
