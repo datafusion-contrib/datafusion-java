@@ -59,14 +59,14 @@ javadoc {
 }
 
 dependencies {
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-format
-    implementation 'org.apache.arrow:arrow-format:6.0.0'
+    implementation 'org.apache.arrow:arrow-format:6.0.1'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-vector
-    implementation 'org.apache.arrow:arrow-vector:6.0.0'
+    implementation 'org.apache.arrow:arrow-vector:6.0.1'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-netty
-    runtimeOnly 'org.apache.arrow:arrow-memory-netty:6.0.0'
+    runtimeOnly 'org.apache.arrow:arrow-memory-netty:6.0.1'
 }
 
 task generateJniHeaders(type: JavaCompile) {
