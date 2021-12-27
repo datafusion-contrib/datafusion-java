@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'org.apache.arrow.datafusion'
-version = '0.5-SNAPSHOT'
+version = '0.6'
 
 repositories {
     mavenCentral()
