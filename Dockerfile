@@ -30,17 +30,16 @@ RUN ./gradlew --version
 
 COPY . .
 
-RUN ./gradlew shadowJar
+RUN ./gradlew installDist
 
-# build shadow jar
 FROM openjdk:11-jdk-slim-bullseye
 
 WORKDIR /usr/opt/datafusion_java
 
 COPY --from=rust-builder /usr/opt/datafusion_jni/target/release/libdatafusion_jni.so ./
 
-COPY --from=java-builder /usr/opt/datafusion_java/datafusion_examples/build/libs/datafusion_examples-0.7-SNAPSHOT-all.jar ./
+COPY --from=java-builder /usr/opt/datafusion_java/datafusion_examples/build/install/datafusion_examples ./
 
-CMD ["--class-path", "/usr/opt/datafusion_java/datafusion_examples-0.7-SNAPSHOT-all.jar", "-R", "-Djava.library.path=/usr/opt/datafusion_java"]
+CMD ["--class-path", "/usr/opt/datafusion_java/lib/*", "-R", "-Djava.library.path=/usr/opt/datafusion_java"]
 
 ENTRYPOINT ["jshell"]
