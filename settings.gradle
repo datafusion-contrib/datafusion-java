@@ -7,5 +7,5 @@
  * in the user manual at https://docs.gradle.org/7.2/userguide/multi_project_builds.html
  */
 
-rootProject.name = 'datafusion_java'
-include 'datafusion_java', 'datafusion_examples'
+rootProject.name = 'datafusion-java'
+include 'datafusion-java', 'datafusion-examples'

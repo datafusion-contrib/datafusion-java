@@ -11,7 +11,7 @@ spotless {
 }
 
 dependencies {
-    implementation project(':datafusion_java')
+    implementation project(':datafusion-java')
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-format
@@ -22,5 +22,5 @@ dependencies {
 
 application {
     mainClass = 'org.apache.arrow.datafusion.examples.ExampleMain'
-    applicationDefaultJvmArgs = ["-Djava.library.path=${buildDir}/../../datafusion_jni/target/debug"]
+    applicationDefaultJvmArgs = ["-Djava.library.path=${buildDir}/../../datafusion-jni/target/debug"]
 }
