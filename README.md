@@ -2,13 +2,13 @@
 
 [![Java CI](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/java.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/java.yml) [![Rust CI](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/rust.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/rust.yml)
 
-A Java binding to [Apache Arrow Datafusion][1]
+A Java binding to [Apache Arrow DataFusion][1]
 
 ## Status
 
-This project is still work in progress, and currently it works with Arrow 6.0 and Datafusion 6.0 version.
-It is build and verified in CI against Java 8, 11, and 15. You may check out the docker run instructions
-where Java 11 `jshell` is used to run interactively.
+This project is still work in progress, and currently it works with Arrow 6.0 and DataFusion 6.0 version.
+It is build and verified in CI against Java 11 and 17. You may check out the docker run instructions
+where Java 17 `jshell` is used to run interactively.
 
 ## How to run
 
