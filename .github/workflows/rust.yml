@@ -14,4 +14,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --manifest-path datafusion_jni/Cargo.toml --release --all-features
+          args: --manifest-path datafusion-jni/Cargo.toml --release --all-features

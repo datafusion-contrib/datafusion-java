@@ -35,20 +35,20 @@ docker build -t datafusion-java .
  => [rust-builder 1/6] FROM docker.io/library/debian:bullseye@sha256:2906804d2a64e8a13a434a1a127fe3f6a28bf7cf3696be  0.0s
  => [java-builder 1/7] FROM docker.io/library/openjdk:11-jdk-bullseye                                                0.0s
  => [stage-2 1/4] FROM docker.io/library/openjdk:11-jdk-slim-bullseye@sha256:5d1529573ab358fd46b823459bae966ca763ed  0.0s
- => CACHED [stage-2 2/4] WORKDIR /usr/opt/datafusion_java                                                            0.0s
+ => CACHED [stage-2 2/4] WORKDIR /usr/opt/datafusion-java                                                            0.0s
  => CACHED [rust-builder 2/6] RUN apt-get update &&   apt-get -y install curl gcc &&   rm -rf /var/lib/apt/lists/*   0.0s
  => CACHED [rust-builder 3/6] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y            0.0s
- => CACHED [rust-builder 4/6] COPY datafusion_jni /usr/opt/datafusion_jni                                            0.0s
- => CACHED [rust-builder 5/6] WORKDIR /usr/opt/datafusion_jni                                                        0.0s
+ => CACHED [rust-builder 4/6] COPY datafusion-jni /usr/opt/datafusion-jni                                            0.0s
+ => CACHED [rust-builder 5/6] WORKDIR /usr/opt/datafusion-jni                                                        0.0s
  => CACHED [rust-builder 6/6] RUN cargo build --release                                                              0.0s
- => CACHED [stage-2 3/4] COPY --from=rust-builder /usr/opt/datafusion_jni/target/release/libdatafusion_jni.so ./     0.0s
- => CACHED [java-builder 2/7] WORKDIR /usr/opt/datafusion_java                                                       0.0s
+ => CACHED [stage-2 3/4] COPY --from=rust-builder /usr/opt/datafusion-jni/target/release/libdatafusion_jni.so ./     0.0s
+ => CACHED [java-builder 2/7] WORKDIR /usr/opt/datafusion-java                                                       0.0s
  => CACHED [java-builder 3/7] COPY build.gradle settings.gradle gradlew ./                                           0.0s
  => CACHED [java-builder 4/7] COPY gradle gradle                                                                     0.0s
  => CACHED [java-builder 5/7] RUN ./gradlew --version                                                                0.0s
  => CACHED [java-builder 6/7] COPY . .                                                                               0.0s
  => CACHED [java-builder 7/7] RUN ./gradlew installDist                                                              0.0s
- => CACHED [stage-2 4/4] COPY --from=java-builder /usr/opt/datafusion_java/datafusion_examples/build/install/datafu  0.0s
+ => CACHED [stage-2 4/4] COPY --from=java-builder /usr/opt/datafusion-java/datafusion-examples/build/install/datafu  0.0s
  => exporting to image                                                                                               0.0s
  => => exporting layers                                                                                              0.0s
  => => writing image sha256:eea330a6e9e2be4ac855ed31bdd1c81d52cd5e102e9fadce18ebed7e4104e87e                         0.0s
