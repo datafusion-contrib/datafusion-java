@@ -18,7 +18,7 @@ WORKDIR /usr/opt/datafusion-jni
 RUN cargo build --release
 
 # build java
-FROM openjdk:11-jdk-bullseye AS java-builder
+FROM openjdk:17-jdk-slim-bullseye AS java-builder
 
 WORKDIR /usr/opt/datafusion-java
 
@@ -32,11 +32,11 @@ COPY . .
 
 RUN ./gradlew installDist
 
-FROM openjdk:11-jdk-slim-bullseye
+FROM openjdk:17-jdk-slim-bullseye
 
 WORKDIR /usr/opt/datafusion-java
 
-COPY --from=rust-builder /usr/opt/datafusion-jni/target/release/libdatafusion-jni.so ./
+COPY --from=rust-builder /usr/opt/datafusion-jni/target/release/libdatafusion_jni.so ./
 
 COPY --from=java-builder /usr/opt/datafusion-java/datafusion-examples/build/install/datafusion-examples ./
 
