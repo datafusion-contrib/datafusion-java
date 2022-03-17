@@ -63,8 +63,8 @@ dependencies {
     implementation 'org.apache.arrow:arrow-format:6.0.1'
     // https://mvnrepository.com/artifact/org.apache.arrow/arrow-vector
     implementation 'org.apache.arrow:arrow-vector:6.0.1'
-    // https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-netty
-    runtimeOnly 'org.apache.arrow:arrow-memory-netty:6.0.1'
+    // https://mvnrepository.com/artifact/org.apache.arrow/arrow-memory-unsafe
+    runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:6.0.1'
 }
 
 tasks.register('cargoBuild') {
