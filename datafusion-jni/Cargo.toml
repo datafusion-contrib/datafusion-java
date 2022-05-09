@@ -12,7 +12,7 @@ edition = "2021"
 [dependencies]
 jni = "^0.19.0"
 tokio = "^1.18.0"
-arrow = "^7.0"
+arrow = "^9.0"
 datafusion = "^7.0"
 
 [lib]
