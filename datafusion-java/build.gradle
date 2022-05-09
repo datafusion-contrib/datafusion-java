@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'datafusion.java-conventions'
     id 'com.diffplug.spotless'
+    id 'com.google.osdetector'
 }
 
 spotless {
@@ -68,12 +69,8 @@ repositories {
     mavenCentral()
 }
 
-tasks.register('cargoBuild') {
-    doLast {
-        exec {
-            workingDir "${workingDir}/../datafusion-jni"
-            executable 'cargo'
-            args 'build'
-        }
-    }
+task cargoBuild(type: Exec) {
+    workingDir '../datafusion-jni'
+    executable 'cargo'
+    args += 'build'
 }
