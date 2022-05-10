@@ -8,7 +8,7 @@ jobs:
   rust:
     strategy:
       matrix:
-        os: [ "ubuntu-latest", "macos-latest", "windows-latest" ]
+        os: [ "ubuntu-latest", "macos-latest" ]
         java: [ "11" ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -75,11 +75,11 @@ jobs:
           name: datafusion-jni-ubuntu-latest
           path: datafusion-jni/target/release
 
-      - name: Download windows artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: datafusion-jni-windows-latest
-          path: datafusion-jni/target/release
+#      - name: Download windows artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: datafusion-jni-windows-latest
+#          path: datafusion-jni/target/release
 
       - name: Download macos artifacts
         uses: actions/download-artifact@v3
