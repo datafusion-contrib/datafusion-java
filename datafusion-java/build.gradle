@@ -33,31 +33,34 @@ task cargoReleaseBuild(type: Exec) {
     args += ['build', '--release']
 }
 
-String libExtension
-if (osdetector.os == "windows") {
-    libExtension = "dll"
-} else if (osdetector.os == "linux") {
-    libExtension = "so"
-} else if (osdetector.os == "osx") {
-    libExtension = "dylib"
-} else {
-    throw new GradleException("Unsupported OS ${osdetector.os}")
+String getLibExtension() {
+    if (osdetector.os == "windows") {
+        return "dll"
+    } else if (osdetector.os == "linux") {
+        return "so"
+    } else if (osdetector.os == "osx") {
+        return "dylib"
+    } else {
+        throw new GradleException("Unsupported OS ${osdetector.os}")
+    }
 }
 
-def jniFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.$libExtension")
-def jniArtifact = artifacts.add('archives', jniFile.get().asFile) {
-    type = libExtension
-    extension = libExtension
-    classifier = osdetector.classifier
-    builtBy 'cargoReleaseBuild'
+PublishArtifact getArtifact(String extension = getLibExtension(), String classifier = osdetector {}.classifier) {
+    def jniFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.$extension")
+    return artifacts.add('archives', jniFile.get().asFile) {
+        type = ext
+        extension
+        classifier
+    }
 }
+
 
 publishing {
     publications {
-        gpr(MavenPublication) {
+        maven(MavenPublication) {
             artifactId = 'datafusion-java'
             from(components.java)
-            artifact jniArtifact
+            artifact getArtifact()
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
