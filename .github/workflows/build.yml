@@ -50,7 +50,7 @@ jobs:
         with:
           name: datafusion-jni-${{ matrix.os }}
           if-no-files-found: error
-          path: "datafusion-jni\target\release\libdatafusion_jni.dll"
+          path: "datafusion-jni\\target\\release\\libdatafusion_jni.dll"
           retention-days: 3
 
   java:
