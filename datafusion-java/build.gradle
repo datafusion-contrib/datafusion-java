@@ -66,7 +66,7 @@ PublishArtifact getArtifact(String extension, String classifier) {
 
 publishing {
     publications {
-        if (System.getProperty("CI") != "") {
+        if (System.getenv("CI") != null) {
             mavenJava(MavenPublication) {
                 artifactId = 'datafusion-java'
                 from(components.java)
@@ -111,8 +111,8 @@ publishing {
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
+                username = findProperty('ossrhUsername')
+                password = findProperty('ossrhPassword')
             }
         }
     }
