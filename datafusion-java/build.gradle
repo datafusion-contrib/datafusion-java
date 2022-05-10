@@ -29,15 +29,30 @@ javadoc {
 
 task cargoReleaseBuild(type: Exec) {
     workingDir '../datafusion-jni'
-    executable 'cargo'
+    executable "${System.getProperty('user.home')}/.cargo/bin/cargo"
     args += ['build', '--release']
 }
 
+def jniArtifacts = []
+
 def dylibFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.dylib")
-def dylibArtifact = artifacts.add('archives', dylibFile.get().asFile) {
-    type = 'dylib'
-    classifier = osdetector.classifier
-    builtBy 'cargoReleaseBuild'
+if (dylibFile.getOrNull() != null) {
+    jniArtifacts += artifacts.add('archives', dylibFile.get().asFile) {
+        type = 'dylib'
+        extension = 'dylib'
+        classifier = osdetector.classifier
+        builtBy 'cargoReleaseBuild'
+    }
+}
+
+def soFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.so")
+if (soFile.getOrNull() != null) {
+    jniArtifacts += artifacts.add('archives', dylibFile.get().asFile) {
+        type = 'so'
+        extension = 'so'
+        classifier = osdetector.classifier
+        builtBy 'cargoReleaseBuild'
+    }
 }
 
 publishing {
@@ -45,7 +60,7 @@ publishing {
         gpr(MavenPublication) {
             artifactId = 'datafusion-java'
             from(components.java)
-            artifact dylibArtifact
+            artifact jniArtifacts.find()
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
