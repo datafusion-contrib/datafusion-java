@@ -33,11 +33,11 @@ task cargoReleaseBuild(type: Exec) {
     args += ['build', '--release']
 }
 
-def jniArtifacts = []
+PublishArtifact jniArtifact = null
 
 def dylibFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.dylib")
-if (dylibFile.getOrNull() != null) {
-    jniArtifacts += artifacts.add('archives', dylibFile.get().asFile) {
+if (dylibFile.get().asFile.exists()) {
+    jniArtifact = artifacts.add('archives', dylibFile.get().asFile) {
         type = 'dylib'
         extension = 'dylib'
         classifier = osdetector.classifier
@@ -46,8 +46,8 @@ if (dylibFile.getOrNull() != null) {
 }
 
 def soFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.so")
-if (soFile.getOrNull() != null) {
-    jniArtifacts += artifacts.add('archives', dylibFile.get().asFile) {
+if (soFile.get().asFile.exists()) {
+    jniArtifact = artifacts.add('archives', dylibFile.get().asFile) {
         type = 'so'
         extension = 'so'
         classifier = osdetector.classifier
@@ -60,7 +60,7 @@ publishing {
         gpr(MavenPublication) {
             artifactId = 'datafusion-java'
             from(components.java)
-            artifact jniArtifacts.stream().findFirst().get()
+            artifact jniArtifact
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
