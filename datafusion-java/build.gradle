@@ -60,7 +60,7 @@ publishing {
         gpr(MavenPublication) {
             artifactId = 'datafusion-java'
             from(components.java)
-            artifact jniArtifacts.find()
+            artifact jniArtifacts.stream().findFirst().get()
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
