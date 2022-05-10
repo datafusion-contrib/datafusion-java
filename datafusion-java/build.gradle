@@ -119,7 +119,11 @@ publishing {
     }
 }
 
-signing {
+signing {open
     required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
+    def signingKeyId = findProperty("signingKeyId")
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     sign publishing.publications.mavenJava
 }
