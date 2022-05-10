@@ -30,7 +30,7 @@ jobs:
         with:
           name: cargo-build
           if-no-files-found: error
-          path: datafusion-jni/target/release
+          path: datafusion-jni/target/release/libdatafusion_jni*
           retention-days: 3
 
       - name: Publish to Maven Local
