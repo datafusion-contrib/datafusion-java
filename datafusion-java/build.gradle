@@ -66,9 +66,10 @@ PublishArtifact getArtifact(String extension, String classifier) {
 
 publishing {
     publications {
+        def artifactId = 'datafusion-java'
         if (System.getenv("CI") != null) {
             mavenJava(MavenPublication) {
-                artifactId = 'datafusion-java'
+                artifactId
                 from(components.java)
                 artifact getArtifact("so", "linux-x86_64")
                 artifact getArtifact("dylib", "osx-x86_64")
@@ -86,7 +87,7 @@ publishing {
             }
         } else {
             mavenJava(MavenPublication) {
-                artifactId = 'datafusion-java'
+                artifactId
                 from(components.java)
                 artifact getArtifact(getLibExtension(), osdetector.classifier)
                 pom {
@@ -111,8 +112,8 @@ publishing {
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = findProperty('ossrhUsername')
-                password = findProperty('ossrhPassword')
+                username = System.getenv("MAVEN_USERNAME") != null ? System.getenv("MAVEN_USERNAME") : findProperty('ossrhUsername')
+                password = System.getenv("MAVEN_USERNAME") != null ? System.getenv("MAVEN_PASSWORD") : findProperty('ossrhPassword')
             }
         }
     }
