@@ -26,13 +26,8 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - name: Upload rust release build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: cargo-build
-          if-no-files-found: error
-          path: datafusion-jni/target/release/libdatafusion_jni*
-          retention-days: 3
+      - name: Cargo build
+        run: ./gradlew cargoReleaseBuild
 
       - name: Publish to Maven Local
         run: ./gradlew publishToMavenLocal
