@@ -1,7 +1,7 @@
 name: Publish package to GitHub Packages
 on:
   release:
-    types: [created]
+    types: [ created ]
 
 jobs:
   publish:
@@ -21,7 +21,8 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Publish package
-        run: gradle publish
+      - name: Publish to Sonatype
+        run: ./gradlew publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}

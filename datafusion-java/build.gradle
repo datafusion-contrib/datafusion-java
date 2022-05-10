@@ -113,7 +113,7 @@ publishing {
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username = System.getenv("MAVEN_USERNAME") != null ? System.getenv("MAVEN_USERNAME") : findProperty('ossrhUsername')
-                password = System.getenv("MAVEN_USERNAME") != null ? System.getenv("MAVEN_PASSWORD") : findProperty('ossrhPassword')
+                password = System.getenv("MAVEN_PASSWORD") != null ? System.getenv("MAVEN_PASSWORD") : findProperty('ossrhPassword')
             }
         }
     }
