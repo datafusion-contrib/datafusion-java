@@ -74,11 +74,11 @@ jobs:
           name: datafusion-jni-ubuntu-latest
           path: datafusion-jni/target/release
 
-      # - name: Download windows artifacts
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: datafusion-jni-windows-latest
-      #     path: datafusion-jni/target/release
+      #      - name: Download windows artifacts
+      #        uses: actions/download-artifact@v3
+      #        with:
+      #          name: datafusion-jni-windows-latest
+      #          path: datafusion-jni/target/release
 
       - name: Download macos artifacts
         uses: actions/download-artifact@v3
@@ -88,10 +88,6 @@ jobs:
 
       - name: Publish to Maven Local
         run: ./gradlew publishToMavenLocal
-        env:
-          ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
 
       - name: Upload built artifacts
         uses: actions/upload-artifact@v3

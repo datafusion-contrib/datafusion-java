@@ -120,7 +120,7 @@ publishing {
 }
 
 signing {
-    // required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
+    required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
     def signingKeyId = findProperty("signingKeyId")
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
