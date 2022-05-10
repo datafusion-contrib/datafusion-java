@@ -33,26 +33,23 @@ task cargoReleaseBuild(type: Exec) {
     args += ['build', '--release']
 }
 
-PublishArtifact jniArtifact = null
-
-def dylibFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.dylib")
-if (dylibFile.get().asFile.exists()) {
-    jniArtifact = artifacts.add('archives', dylibFile.get().asFile) {
-        type = 'dylib'
-        extension = 'dylib'
-        classifier = osdetector.classifier
-        builtBy 'cargoReleaseBuild'
-    }
+String libExtension
+if (osdetector.os == "windows") {
+    libExtension = "dll"
+} else if (osdetector.os == "linux") {
+    libExtension = "so"
+} else if (osdetector.os == "osx") {
+    libExtension = "dylib"
+} else {
+    throw new GradleException("Unsupported OS ${osdetector.os}")
 }
 
-def soFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.so")
-if (soFile.get().asFile.exists()) {
-    jniArtifact = artifacts.add('archives', dylibFile.get().asFile) {
-        type = 'so'
-        extension = 'so'
-        classifier = osdetector.classifier
-        builtBy 'cargoReleaseBuild'
-    }
+def jniFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.$libExtension")
+def jniArtifact = artifacts.add('archives', jniFile.get().asFile) {
+    type = libExtension
+    extension = libExtension
+    classifier = osdetector.classifier
+    builtBy 'cargoReleaseBuild'
 }
 
 publishing {
