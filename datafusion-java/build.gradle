@@ -6,6 +6,14 @@ plugins {
     id 'com.google.osdetector'
 }
 
+dependencies {
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
+    implementation 'org.apache.arrow:arrow-format:7.0.0'
+    implementation 'org.apache.arrow:arrow-vector:7.0.0'
+    runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:7.0.0'
+}
+
 spotless {
     java {
         googleJavaFormat()
@@ -33,6 +41,7 @@ task cargoReleaseBuild(type: Exec) {
     args += ['build', '--release']
 }
 
+@SuppressWarnings('GrMethodMayBeStatic')
 String getLibExtension() {
     if (osdetector.os == "windows") {
         return "dll"
@@ -45,7 +54,7 @@ String getLibExtension() {
     }
 }
 
-PublishArtifact getArtifact(String extension = getLibExtension(), String classifier = osdetector {}.classifier) {
+PublishArtifact getArtifact(String extension = getLibExtension(), String classifier = osdetector.classifier) {
     def jniFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.$extension")
     return artifacts.add('archives', jniFile.get().asFile) {
         type = ext
@@ -54,25 +63,44 @@ PublishArtifact getArtifact(String extension = getLibExtension(), String classif
     }
 }
 
-
 publishing {
     publications {
-        maven(MavenPublication) {
-            artifactId = 'datafusion-java'
-            from(components.java)
-            artifact getArtifact()
-            pom {
-                name = 'DataFusion Java'
-                description = 'A Java binding to Apache Arrow DataFusion library'
-                url = 'https://github.com/datafusion-contrib/datafusion-java'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        if (System.getProperty("CI") != "") {
+            all(MavenPublication) {
+                artifactId = 'datafusion-java'
+                from(components.java)
+                artifact getArtifact()
+                pom {
+                    name = 'DataFusion Java'
+                    description = 'A Java binding to Apache Arrow DataFusion library'
+                    url = 'https://github.com/datafusion-contrib/datafusion-java'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                }
+            }
+        } else {
+            local(MavenPublication) {
+                artifactId = 'datafusion-java'
+                from(components.java)
+                artifact getArtifact()
+                pom {
+                    name = 'DataFusion Java'
+                    description = 'A Java binding to Apache Arrow DataFusion library'
+                    url = 'https://github.com/datafusion-contrib/datafusion-java'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
                     }
                 }
             }
         }
+
     }
     repositories {
         maven {
@@ -86,11 +114,4 @@ publishing {
     }
 }
 
-dependencies {
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
-    implementation 'org.apache.arrow:arrow-format:7.0.0'
-    implementation 'org.apache.arrow:arrow-vector:7.0.0'
-    runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:7.0.0'
-}
 
