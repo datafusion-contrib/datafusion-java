@@ -74,11 +74,11 @@ jobs:
           name: datafusion-jni-ubuntu-latest
           path: datafusion-jni/target/release
 
-#      - name: Download windows artifacts
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: datafusion-jni-windows-latest
-#          path: datafusion-jni/target/release
+      #      - name: Download windows artifacts
+      #        uses: actions/download-artifact@v3
+      #        with:
+      #          name: datafusion-jni-windows-latest
+      #          path: datafusion-jni/target/release
 
       - name: Download macos artifacts
         uses: actions/download-artifact@v3
@@ -96,9 +96,3 @@ jobs:
           if-no-files-found: error
           path: ~/.m2/repository/io/github/datafusion-contrib/datafusion-java
           retention-days: 3
-
-      - name: Publish to Sonatype
-        run: ./gradlew publish
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
