@@ -54,12 +54,12 @@ String getLibExtension() {
     }
 }
 
-PublishArtifact getArtifact(String extension = getLibExtension(), String classifier = osdetector.classifier) {
+PublishArtifact getArtifact(String extension, String classifier) {
     def jniFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.$extension")
     return artifacts.add('archives', jniFile.get().asFile) {
-        type = ext
-        extension
-        classifier
+        type = extension
+        extension = extension
+        classifier = classifier
     }
 }
 
@@ -69,7 +69,8 @@ publishing {
             all(MavenPublication) {
                 artifactId = 'datafusion-java'
                 from(components.java)
-                artifact getArtifact()
+                artifact getArtifact("so", "linux-x86_64")
+                artifact getArtifact("dylib", "osx-x86_64")
                 pom {
                     name = 'DataFusion Java'
                     description = 'A Java binding to Apache Arrow DataFusion library'
@@ -86,7 +87,7 @@ publishing {
             local(MavenPublication) {
                 artifactId = 'datafusion-java'
                 from(components.java)
-                artifact getArtifact()
+                artifact getArtifact(getLibExtension(), osdetector.classifier)
                 pom {
                     name = 'DataFusion Java'
                     description = 'A Java binding to Apache Arrow DataFusion library'
