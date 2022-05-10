@@ -1,0 +1,37 @@
+name: Build Java and Rust
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ "11", "17" ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: "adopt"
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Publish to Maven Local
+        run: ./gradlew publishToMavenLocal
+
+      - name: Upload built artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: datafusion-java
+          if-no-files-found: error
+          path: ~/.m2/repository/io/github/datafusion-contrib/datafusion-java
+          retention-days: 3

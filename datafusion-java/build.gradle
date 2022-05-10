@@ -21,11 +21,31 @@ java {
     }
 }
 
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+task cargoReleaseBuild(type: Exec) {
+    workingDir '../datafusion-jni'
+    executable 'cargo'
+    args += ['build', '--release']
+}
+
+def dylibFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.dylib")
+def dylibArtifact = artifacts.add('archives', dylibFile.get().asFile) {
+    type = 'dylib'
+    classifier = osdetector.classifier
+    builtBy 'cargoReleaseBuild'
+}
+
 publishing {
     publications {
         gpr(MavenPublication) {
             artifactId = 'datafusion-java'
             from(components.java)
+            artifact dylibArtifact
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
@@ -51,12 +71,6 @@ publishing {
     }
 }
 
-javadoc {
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
-}
-
 dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
@@ -65,12 +79,3 @@ dependencies {
     runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:7.0.0'
 }
 
-repositories {
-    mavenCentral()
-}
-
-task cargoBuild(type: Exec) {
-    workingDir '../datafusion-jni'
-    executable 'cargo'
-    args += 'build'
-}

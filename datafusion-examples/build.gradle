@@ -22,9 +22,4 @@ dependencies {
 
 application {
     mainClass = 'org.apache.arrow.datafusion.examples.ExampleMain'
-    applicationDefaultJvmArgs = ["-Djava.library.path=${buildDir}/../../datafusion-jni/target/debug"]
-}
-
-repositories {
-    mavenCentral()
 }
