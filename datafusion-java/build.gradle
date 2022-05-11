@@ -83,6 +83,18 @@ publishing {
                             url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         }
                     }
+                    developers {
+                        developer {
+                            id = 'dev'
+                            name = 'Apache Arrow Developers'
+                            email = 'dev@arrow.apache.org'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git@github.com:datafusion-contrib/datafusion-java.git'
+                        developerConnection = 'scm:git:https://github.com/datafusion-contrib/datafusion-java.git'
+                        url = 'https://github.com/datafusion-contrib/datafusion-java'
+                    }
                 }
             }
         } else {
