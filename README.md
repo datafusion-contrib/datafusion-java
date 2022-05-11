@@ -1,24 +1,142 @@
 # datafusion-java
 
-[![Java CI](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/java.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/java.yml) [![Rust CI](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/rust.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/rust.yml)
+[![Build](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/build.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/build.yml)
+[![Release](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.maven.apache.org%2Fmaven2%2Fio%2Fgithub%2Fdatafusion-contrib%2Fdatafusion-java%2Fmaven-metadata.xml)](https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/)
 
 A Java binding to [Apache Arrow DataFusion][1]
 
 ## Status
 
-This project is still work in progress, and currently it works with Arrow 6.0 and DataFusion 6.0 version.
+This project is still work in progress, and currently it works with Arrow 9.0 and DataFusion 7.0 version.
 It is build and verified in CI against Java 11 and 17. You may check out the docker run instructions
 where Java 17 `jshell` is used to run interactively.
 
-## How to run
+## How to use in your code
+
+The artifacts are [published][1] to maven central, so you can use like any normal Java libraries:
+
+```groovy
+dependencies {
+    implementation(
+        group = "io.github.datafusion-contrib",
+        name = "datafusion-java",
+        version = "0.7.1" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
+    )
+}
+```
+
+Additionally, given this is a JNI project, you'll need to download the pre-built binary to be loaded during runtime. The pre-built libraries are compiled, signed, and verified from GitHub workflow actions, and are made available in https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/{a.b.c}/ where `{a.b.c}` is the latest version:
+
+- `datafusion-java-a.b.c.so` is for linux-x86_64 machines
+- `datafusion-java-a.b.c.dylib` is for macOS machines
+
+Additionally you are encouraged to check the GPG signature as well as the sha256 sum of the binaries just to be sure.
+
+Once downloaded, rename the library as `libdatafusion_jni.so` or `libdatafusion_jni.dylib` and put it to a directory readable by your application. During startup time, make sure you pass:
+
+```bash
+# or use gradle run but supply --args instead
+java -Djava.library.path=/Users/me/dir/to/jni/library/ ...
+```
+
+to the command line.
+
+To test it out, you can use this piece of demo code:
+
+<details>
+<summary>DataFusionDemo.java</summary>
+
+```java
+package com.me;
+
+import org.apache.arrow.datafusion.DataFrame;
+import org.apache.arrow.datafusion.ExecutionContext;
+import org.apache.arrow.datafusion.ExecutionContexts;
+
+public class DataFusionDemo {
+
+    public static void main(String[] args) throws Exception {
+        try (ExecutionContext executionContext = ExecutionContexts.create()) {
+            executionContext.sql("select sqrt(65536)").thenCompose(DataFrame::show).join();
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary>build.gradle.kts</summary>
+
+```kotlin
+plugins {
+  java
+  application
+}
+
+repositories {
+  mavenCentral()
+  google()
+}
+
+tasks {
+  application {
+    mainClass.set("com.me.DataFusionDemo")
+    applicationDefaultJvmArgs += "-Djava.library.path=/Users/me/libraries/"
+  }
+}
+
+dependencies {
+  implementation(
+    group = "io.github.datafusion-contrib",
+    name = "datafusion-java",
+    version = "0.7.1"
+  )
+}
+
+```
+
+</details>
+
+<details>
+<summary>Run result</summary>
+
+```
+
+$ ./gradlew run
+...
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :processResources NO-SOURCE
+> Task :classes UP-TO-DATE
+
+> Task :run
+successfully created tokio runtime
++--------------------+
+| sqrt(Int64(65536)) |
++--------------------+
+| 256                |
++--------------------+
+successfully shutdown tokio runtime
+
+BUILD SUCCESSFUL in 2s
+3 actionable tasks: 1 executed, 2 up-to-date
+16:43:34: Execution finished 'run'.
+
+
+```
+
+</details>
+
+## How to run the interactive demo
 
 ### 1. Run using Docker (with `jshell`)
 
 First build the docker image:
 
-```bash
-docker build -t datafusion-java .
-```
+<details>
+<summary>docker build -t datafusion-java .</summary>
 
 ```text
 ❯ docker build -t datafusion-java .
@@ -55,11 +173,12 @@ docker build -t datafusion-java .
  => => naming to docker.io/library/datafusion-java                                                                   0.0s
 ```
 
+</details>
+
 Then run using Docker:
 
-```bash
-docker run --rm -it datafusion-java
-```
+<details>
+<summary>docker run --rm -it datafusion-java</summary>
 
 ```text
 Dec 27, 2021 2:52:22 AM java.util.prefs.FileSystemPreferences$1 run
@@ -98,19 +217,16 @@ jshell> var v = root.getVector(0)
 v ==> [0.6838531634528577]
 ```
 
-### 2. Using pre-built artifact
+</details>
 
-1. Checkout the [release page](https://github.com/datafusion-contrib/datafusion-java/releases) for a pre-built MacOS JNI library.
-1. Checkout the [GitHub maven repository](https://github.com/datafusion-contrib/datafusion-java/packages/1047809) for installing the Java artifacts.
-
-### 3. Build from source
+### 2. Build from source
 
 Note you must have local Rust and Java environment setup.
 
 Run the example in one line:
 
 ```bash
-./gradlew cargoBuild run
+./gradlew cargoReleaseBuild run
 ```
 
 Or roll your own test example:
@@ -150,24 +266,5 @@ To build the library:
 ./gradlew build
 ```
 
-## How to develop
-
-To Generate JNI Headers:
-
-```bash
-./gradlew generateJniHeaders
-```
-
-To Generate Javadoc:
-
-```bash
-./gradlew javadoc
-```
-
-To formate code (before push):
-
-```bash
-./gradlew spotlessApply # use spotlessCheck to check
-```
-
 [1]: https://github.com/apache/arrow-datafusion
+[2]: https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/
