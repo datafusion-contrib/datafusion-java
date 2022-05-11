@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/build.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/build.yml)
 [![Release](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml)
-![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.maven.apache.org%2Fmaven2%2Fio%2Fgithub%2Fdatafusion-contrib%2Fdatafusion-java%2Fmaven-metadata.xml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.maven.apache.org%2Fmaven2%2Fio%2Fgithub%2Fdatafusion-contrib%2Fdatafusion-java%2Fmaven-metadata.xml)](https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/)
 
 A Java binding to [Apache Arrow DataFusion][1]
 
@@ -12,7 +12,7 @@ This project is still work in progress, and currently it works with Arrow 9.0 an
 It is build and verified in CI against Java 11 and 17. You may check out the docker run instructions
 where Java 17 `jshell` is used to run interactively.
 
-## How to use
+## How to use in your code
 
 The artifacts are [published][1] to maven central, so you can use like any normal Java libraries:
 
@@ -129,7 +129,7 @@ BUILD SUCCESSFUL in 2s
 
 </details>
 
-## How to run demo
+## How to run the interactive demo
 
 ### 1. Run using Docker (with `jshell`)
 
@@ -219,19 +219,14 @@ v ==> [0.6838531634528577]
 
 </details>
 
-### 2. Using pre-built artifact
-
-1. Checkout the [release page](https://github.com/datafusion-contrib/datafusion-java/releases) for a pre-built MacOS JNI library.
-1. Checkout the [GitHub maven repository](https://github.com/datafusion-contrib/datafusion-java/packages/1047809) for installing the Java artifacts.
-
-### 3. Build from source
+### 2. Build from source
 
 Note you must have local Rust and Java environment setup.
 
 Run the example in one line:
 
 ```bash
-./gradlew cargoBuild run
+./gradlew cargoReleaseBuild run
 ```
 
 Or roll your own test example:
