@@ -10,7 +10,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_TokioRuntime_createTokio
     _class: JClass,
 ) -> jlong {
     if let Ok(runtime) = Runtime::new() {
-        println!("successfully created tokio runtime");
+        // println!("successfully created tokio runtime");
         Box::into_raw(Box::new(runtime)) as jlong
     } else {
         // TODO error handling
@@ -25,5 +25,5 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_TokioRuntime_destroyToki
 ) {
     let runtime = unsafe { Box::from_raw(pointer as *mut Runtime) };
     runtime.shutdown_timeout(Duration::from_millis(100));
-    println!("successfully shutdown tokio runtime");
+    // println!("successfully shutdown tokio runtime");
 }
