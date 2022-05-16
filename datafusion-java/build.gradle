@@ -37,15 +37,30 @@ javadoc {
 }
 
 task cargoReleaseBuild(type: Exec) {
-    workingDir '../datafusion-jni'
+    workingDir "$rootDir/datafusion-jni"
     executable "${System.getProperty('user.home')}/.cargo/bin/cargo"
     args += ['build', '--release']
 }
 
-task OsxJar(type: Jar) {
+def extensionMapping = [
+        "osx"    : "dylib",
+        "linux"  : "so",
+        "windows": "dll"
+]
+
+task copyBuiltLibrary(type: Copy) {
+    def extension = extensionMapping[osdetector.os]
+    from "${rootDir}/datafusion-jni/target/release/libdatafusion_jni.$extension"
+    into layout.buildDirectory.dir("libdatafusion_jni")
+    dependsOn cargoReleaseBuild
+}
+
+task jarOsx(type: Jar) {
+    def extension = extensionMapping[osdetector.os]
     from sourceSets.main.output
-    from layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.dylib")
+    from layout.buildDirectory.file("libdatafusion_jni/libdatafusion_jni.$extension")
     archiveClassifier.set("osx-x86_64")
+    dependsOn copyBuiltLibrary
 }
 
 publishing {
@@ -53,7 +68,7 @@ publishing {
         mavenJava(MavenPublication) {
             artifactId 'datafusion-java'
             from(components.java)
-            artifact OsxJar
+            artifact jarOsx
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
