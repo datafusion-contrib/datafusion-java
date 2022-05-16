@@ -17,3 +17,7 @@ datafusion = "^7.0"
 
 [lib]
 crate_type = ["cdylib"]
+
+[profile.release]
+lto = true
+strip = true
