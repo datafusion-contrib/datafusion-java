@@ -31,7 +31,7 @@ jobs:
         with:
           name: datafusion-jni-${{ matrix.os }}
           if-no-files-found: error
-          path: "datafusion-jni/target/release/libdatafusion_jni.dylib"
+          path: "datafusion-java/build/jni_libs/osx-x86_64/libdatafusion_jni.dylib"
           retention-days: 3
 
       - name: Upload built artifacts
@@ -40,7 +40,7 @@ jobs:
         with:
           name: datafusion-jni-${{ matrix.os }}
           if-no-files-found: error
-          path: "datafusion-jni/target/release/libdatafusion_jni.so"
+          path: "datafusion-java/build/jni_libs/linux-x86_64/libdatafusion_jni.so"
           retention-days: 3
 
       - name: Upload built artifacts
@@ -49,7 +49,7 @@ jobs:
         with:
           name: datafusion-jni-${{ matrix.os }}
           if-no-files-found: error
-          path: "datafusion-jni\\target\\release\\libdatafusion_jni.dll"
+          path: "datafusion-java\\build\\jni_libs\\windows-x86_64\\libdatafusion_jni.dll"
           retention-days: 3
 
   java:
@@ -72,19 +72,19 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: datafusion-jni-ubuntu-latest
-          path: datafusion-jni/target/release
+          path: datafusion-java/build/jni_libs/linux-x86_64
 
-      #      - name: Download windows artifacts
-      #        uses: actions/download-artifact@v3
-      #        with:
-      #          name: datafusion-jni-windows-latest
-      #          path: datafusion-jni/target/release
+      #  - name: Download windows artifacts
+      #    uses: actions/download-artifact@v3
+      #    with:
+      #      name: datafusion-jni-windows-latest
+      #      path: datafusion-jni/target/release
 
       - name: Download macos artifacts
         uses: actions/download-artifact@v3
         with:
           name: datafusion-jni-macos-latest
-          path: datafusion-jni/target/release
+          path: datafusion-java/build/jni_libs/osx-x86_64
 
       - name: Publish to Maven Local
         run: ./gradlew publishToMavenLocal

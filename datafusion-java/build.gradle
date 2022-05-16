@@ -51,15 +51,40 @@ def extensionMapping = [
 task copyBuiltLibrary(type: Copy) {
     def extension = extensionMapping[osdetector.os]
     from "${rootDir}/datafusion-jni/target/release/libdatafusion_jni.$extension"
-    into layout.buildDirectory.dir("libdatafusion_jni")
+    into layout.buildDirectory.dir("jni_libs/${osdetector.classifier}")
     dependsOn cargoReleaseBuild
 }
 
-task jarOsx(type: Jar) {
-    def extension = extensionMapping[osdetector.os]
+def classifierOsx = 'osx-x86_64'
+def extensionOsx = 'dylib'
+def jniLibOsx = layout.buildDirectory.file("jni_libs/$classifierOsx/libdatafusion_jni.$extensionOsx")
+
+def classifierLinux = 'linux-x86_64'
+def extensionLinux = 'so'
+def jniLibLinux = layout.buildDirectory.file("jni_libs/$classifierLinux/libdatafusion_jni.$extensionLinux")
+
+task jarWithOsxLib(type: Jar) {
     from sourceSets.main.output
-    from layout.buildDirectory.file("libdatafusion_jni/libdatafusion_jni.$extension")
-    archiveClassifier.set("osx-x86_64")
+    from jniLibOsx
+    rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
+    archiveClassifier.set(classifierOsx)
+    dependsOn copyBuiltLibrary
+}
+
+task jarWithLinuxLib(type: Jar) {
+    from sourceSets.main.output
+    from jniLibLinux
+    rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
+    archiveClassifier.set(classifierLinux)
+    dependsOn copyBuiltLibrary
+}
+
+task jarWithLib(type: Jar) {
+    from sourceSets.main.output
+    from jniLibOsx
+    rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
+    from jniLibLinux
+    rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
     dependsOn copyBuiltLibrary
 }
 
@@ -68,7 +93,7 @@ publishing {
         mavenJava(MavenPublication) {
             artifactId 'datafusion-java'
             from(components.java)
-            artifact jarOsx
+            artifact jarWithLib
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
@@ -108,31 +133,23 @@ publishing {
     }
 }
 
-//static String getLibExtension(classifier = osdetector.classifier) {
-//    if (classifier.startsWith("windows")) {
-//        return "dll"
-//    } else if (classifier.startsWith("linux")) {
-//        return "so"
-//    } else if (classifier.startsWith("osx")) {
-//        return "dylib"
-//    } else {
-//        throw new GradleException("Unsupported OS in classifier ${classifier}")
-//    }
-//}
-//
-//def supportedClassifiers = ["linux-x86_64", "osx-x86_64",]
-//
-//supportedClassifiers.each { classifier ->
-//    def extension = getLibExtension(classifier)
-//    def source = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.$extension").get().asFile
-//    if (source.exists()) {
-//        publishing.publications.mavenJava.artifacts.artifact([
-//                source    : source,
-//                classifier: classifier,
-//                extension : extension
-//        ])
-//    }
-//}
+def artifacts = publishing.publications.mavenJava.artifacts
+
+if (jniLibLinux.get().asFile.exists()) {
+    artifacts.artifact([
+            source    : jniLibLinux,
+            classifier: classifierLinux,
+            extension : extensionLinux
+    ])
+}
+
+if (jniLibOsx.get().asFile.exists()) {
+    artifacts.artifact([
+            source    : jniLibOsx,
+            classifier: classifierOsx,
+            extension : extensionOsx
+    ])
+}
 
 
 signing {
