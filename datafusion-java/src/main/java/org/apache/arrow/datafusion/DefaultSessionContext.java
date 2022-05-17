@@ -87,6 +87,6 @@ class DefaultSessionContext extends AbstractProxy implements SessionContext {
 
   @Override
   void doClose(long pointer) throws Exception {
-    ExecutionContexts.destroyExecutionContext(pointer);
+    SessionContexts.destroySessionContext(pointer);
   }
 }

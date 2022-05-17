@@ -36,7 +36,7 @@ package com.me;
 
 import org.apache.arrow.datafusion.DataFrame;
 import org.apache.arrow.datafusion.SessionContext;
-import org.apache.arrow.datafusion.ExecutionContexts;
+import org.apache.arrow.datafusion.SessionContexts;
 
 public class DataFusionDemo {
 
