@@ -52,7 +52,7 @@ task copyBuiltLibrary(type: Copy) {
     def extension = extensionMapping[osdetector.os]
     from "${rootDir}/datafusion-jni/target/release/libdatafusion_jni.$extension"
     into layout.buildDirectory.dir("jni_libs/${osdetector.classifier}")
-    dependsOn cargoReleaseBuild
+    // dependsOn cargoReleaseBuild
 }
 
 def classifierOsx = 'osx-x86_64'
