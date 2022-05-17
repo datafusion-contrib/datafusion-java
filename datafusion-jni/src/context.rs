@@ -1,4 +1,4 @@
-use datafusion::execution::context::ExecutionContext;
+use datafusion::execution::context::SessionContext;
 use datafusion::prelude::CsvReadOptions;
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::jlong;
@@ -6,7 +6,7 @@ use jni::JNIEnv;
 use tokio::runtime::Runtime;
 
 #[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_registerCsv(
+pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_registerCsv(
     env: JNIEnv,
     _class: JClass,
     runtime: jlong,
@@ -24,7 +24,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_
         .get_string(path)
         .expect("Couldn't get name as string!")
         .into();
-    let context = unsafe { &mut *(pointer as *mut ExecutionContext) };
+    let context = unsafe { &mut *(pointer as *mut SessionContext) };
     runtime.block_on(async {
         let register_result = context
             .register_csv(&name, &path, CsvReadOptions::new())
@@ -44,7 +44,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_
 }
 
 #[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_registerParquet(
+pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_registerParquet(
     env: JNIEnv,
     _class: JClass,
     runtime: jlong,
@@ -62,7 +62,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_
         .get_string(path)
         .expect("Couldn't get name as string!")
         .into();
-    let context = unsafe { &mut *(pointer as *mut ExecutionContext) };
+    let context = unsafe { &mut *(pointer as *mut SessionContext) };
     runtime.block_on(async {
         let register_result = context.register_parquet(&name, &path).await;
         let err_message: JValue = match register_result {
@@ -80,7 +80,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_
 }
 
 #[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_querySql(
+pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_querySql(
     env: JNIEnv,
     _class: JClass,
     runtime: jlong,
@@ -93,7 +93,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_
         .get_string(sql)
         .expect("Couldn't get sql as string!")
         .into();
-    let context = unsafe { &mut *(pointer as *mut ExecutionContext) };
+    let context = unsafe { &mut *(pointer as *mut SessionContext) };
     runtime.block_on(async {
         let query_result = context.sql(&sql).await;
         match query_result {
@@ -123,19 +123,19 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultExecutionContext_
     });
 }
 #[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_ExecutionContexts_destroyExecutionContext(
+pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_destroySessionContext(
     _env: JNIEnv,
     _class: JClass,
     pointer: jlong,
 ) {
-    let _ = unsafe { Box::from_raw(pointer as *mut ExecutionContext) };
+    let _ = unsafe { Box::from_raw(pointer as *mut SessionContext) };
 }
 
 #[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_ExecutionContexts_createExecutionContext(
+pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContextContexts_createSessionContext(
     _env: JNIEnv,
     _class: JClass,
 ) -> jlong {
-    let context = ExecutionContext::new();
+    let context = SessionContext::new();
     Box::into_raw(Box::new(context)) as jlong
 }

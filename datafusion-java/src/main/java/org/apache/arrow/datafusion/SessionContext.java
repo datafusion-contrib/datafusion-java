@@ -3,8 +3,8 @@ package org.apache.arrow.datafusion;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-/** An execution context holds resources and is the entrance for obtaining {@link DataFrame} */
-public interface ExecutionContext extends AutoCloseable, NativeProxy {
+/** A session context holds resources and is the entrance for obtaining {@link DataFrame} */
+public interface SessionContext extends AutoCloseable, NativeProxy {
 
   /** Obtain the {@link DataFrame} by running the {@code sql} against the datafusion library */
   CompletableFuture<DataFrame> sql(String sql);

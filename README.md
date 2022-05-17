@@ -35,7 +35,7 @@ To test it out, you can use this piece of demo code:
 package com.me;
 
 import org.apache.arrow.datafusion.DataFrame;
-import org.apache.arrow.datafusion.ExecutionContext;
+import org.apache.arrow.datafusion.SessionContext;
 import org.apache.arrow.datafusion.ExecutionContexts;
 
 public class DataFusionDemo {
@@ -178,7 +178,7 @@ INFO: Created user preferences directory.
 jshell> import org.apache.arrow.datafusion.*
 
 jshell> var context = ExecutionContexts.create()
-context ==> org.apache.arrow.datafusion.DefaultExecutionContext@4229bb3f
+context ==> org.apache.arrow.datafusion.DefaultSessionContext@4229bb3f
 
 jshell> var df = context.sql("select 1.1 + cos(2.0)").join()
 df ==> org.apache.arrow.datafusion.DefaultDataFrame@1a18644

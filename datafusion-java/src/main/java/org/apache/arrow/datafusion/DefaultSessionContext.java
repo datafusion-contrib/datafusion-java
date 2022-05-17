@@ -6,9 +6,9 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class DefaultExecutionContext extends AbstractProxy implements ExecutionContext {
+class DefaultSessionContext extends AbstractProxy implements SessionContext {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultExecutionContext.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultSessionContext.class);
 
   static native void querySql(
       long runtime, long context, String sql, ObjectResultCallback callback);
@@ -31,8 +31,7 @@ class DefaultExecutionContext extends AbstractProxy implements ExecutionContext 
           if (null != errMessage && !errMessage.equals("")) {
             future.completeExceptionally(new RuntimeException(errMessage));
           } else {
-            DefaultDataFrame frame =
-                new DefaultDataFrame(DefaultExecutionContext.this, dataframeId);
+            DefaultDataFrame frame = new DefaultDataFrame(DefaultSessionContext.this, dataframeId);
             future.complete(frame);
           }
         });
@@ -80,7 +79,7 @@ class DefaultExecutionContext extends AbstractProxy implements ExecutionContext 
 
   private final TokioRuntime runtime;
 
-  DefaultExecutionContext(long pointer) {
+  DefaultSessionContext(long pointer) {
     super(pointer);
     this.runtime = TokioRuntime.create();
     registerChild(runtime);

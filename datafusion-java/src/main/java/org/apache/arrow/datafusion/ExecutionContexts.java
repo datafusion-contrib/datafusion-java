@@ -12,8 +12,8 @@ public class ExecutionContexts {
     JNILoader.load();
   }
 
-  public static ExecutionContext create() {
+  public static SessionContext create() {
     long pointer = createExecutionContext();
-    return new DefaultExecutionContext(pointer);
+    return new DefaultSessionContext(pointer);
   }
 }
