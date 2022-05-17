@@ -92,7 +92,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId 'datafusion-java'
-            from(components.java)
+            artifact sourcesJar
+            artifact javadocJar
             artifact jarWithLib
             pom {
                 name = 'DataFusion Java'
