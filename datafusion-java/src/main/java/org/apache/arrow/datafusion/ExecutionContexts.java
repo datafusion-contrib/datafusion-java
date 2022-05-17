@@ -9,10 +9,7 @@ public class ExecutionContexts {
   static native void destroyExecutionContext(long pointer);
 
   static {
-    // This actually loads the shared object that we'll be creating.
-    // The actual location of the .so or .dll may differ based on your
-    // platform.
-    System.loadLibrary("datafusion_jni");
+    JNILoader.load();
   }
 
   public static ExecutionContext create() {
