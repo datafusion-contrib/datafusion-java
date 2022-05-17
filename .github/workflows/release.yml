@@ -24,7 +24,6 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: "15"
-          distribution: "adoptium"
 
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
@@ -70,7 +69,6 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 15
-          distribution: "adoptium"
 
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
