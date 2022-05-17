@@ -87,5 +87,5 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_destroyDataFr
     _class: JClass,
     pointer: jlong,
 ) {
-    let _ = unsafe { Box::from_raw(pointer as *mut DataFrame) };
+    let _ = unsafe { Box::from_raw(pointer as *mut Arc<DataFrame>) };
 }
