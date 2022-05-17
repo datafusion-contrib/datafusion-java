@@ -86,6 +86,9 @@ jobs:
           name: datafusion-jni-macos-latest
           path: datafusion-java/build/jni_libs/osx-x86_64
 
+      - name: List downloaded artifacts
+        run: tree datafusion-java/build/jni_libs
+
       - name: Publish to Maven Local
         run: ./gradlew publishToMavenLocal
 
