@@ -134,19 +134,11 @@ publishing {
 def artifacts = publishing.publications.mavenJava.artifacts
 
 if (jniLibLinux.get().asFile.exists()) {
-    artifacts.artifact([
-            source    : jniLibLinux,
-            classifier: classifierLinux,
-            extension : extensionLinux
-    ])
+    artifacts.artifact jarWithLinuxLib
 }
 
 if (jniLibOsx.get().asFile.exists()) {
-    artifacts.artifact([
-            source    : jniLibOsx,
-            classifier: classifierOsx,
-            extension : extensionOsx
-    ])
+    artifacts.artifact jarWithOsxLib
 }
 
 
