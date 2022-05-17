@@ -21,26 +21,10 @@ dependencies {
     implementation(
         group = "io.github.datafusion-contrib",
         name = "datafusion-java",
-        version = "0.7.1" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
+        version = "0.9.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
     )
 }
 ```
-
-Additionally, given this is a JNI project, you'll need to download the pre-built binary to be loaded during runtime. The pre-built libraries are compiled, signed, and verified from GitHub workflow actions, and are made available in https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/{a.b.c}/ where `{a.b.c}` is the latest version:
-
-- `datafusion-java-a.b.c.so` is for linux-x86_64 machines
-- `datafusion-java-a.b.c.dylib` is for macOS machines
-
-Additionally you are encouraged to check the GPG signature as well as the sha256 sum of the binaries just to be sure.
-
-Once downloaded, rename the library as `libdatafusion_jni.so` or `libdatafusion_jni.dylib` and put it to a directory readable by your application. During startup time, make sure you pass:
-
-```bash
-# or use gradle run but supply --args instead
-java -Djava.library.path=/Users/me/dir/to/jni/library/ ...
-```
-
-to the command line.
 
 To test it out, you can use this piece of demo code:
 
