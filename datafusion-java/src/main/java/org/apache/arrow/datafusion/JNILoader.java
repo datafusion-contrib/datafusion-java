@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class JNILoader {
 
   private JNILoader() {}
+
+  private static final Logger logger = LoggerFactory.getLogger(JNILoader.class);
 
   private static final AtomicBoolean loaded = new AtomicBoolean(false);
 
@@ -50,6 +54,7 @@ final class JNILoader {
 
   static synchronized void load() {
     if (loaded.get()) {
+      logger.debug("{} already loaded, returning", libraryName);
       return;
     }
     String resourceName = getResourceName();
@@ -58,6 +63,7 @@ final class JNILoader {
       try {
         System.loadLibrary(libraryName);
         loaded.set(true);
+        logger.debug("successfully loaded {} from library path", libraryName);
         return;
       } catch (UnsatisfiedLinkError e) {
         UnsatisfiedLinkError err =
@@ -73,6 +79,7 @@ final class JNILoader {
       // fall-back to loading from the system library path
       try {
         System.loadLibrary(libraryName);
+        logger.debug("successfully loaded {} from extracted lib file", libraryName);
         loaded.set(true);
       } catch (UnsatisfiedLinkError le2) {
         // display error in case problem with loading from temp folder

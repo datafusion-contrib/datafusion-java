@@ -15,7 +15,7 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
   protected AbstractProxy(long pointer) {
     this.pointer = pointer;
     if (logger.isDebugEnabled()) {
-      logger.debug("Obtaining {}@{}", getClass().getSimpleName(), pointer);
+      logger.debug("Obtaining {}@{}", getClass().getSimpleName(), Long.toHexString(pointer));
     }
     this.closed = new AtomicBoolean(false);
     this.children = new ConcurrentHashMap<>();
@@ -49,7 +49,7 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
         }
       }
       if (logger.isDebugEnabled()) {
-        logger.debug("Closing {}@{}", getClass().getSimpleName(), pointer);
+        logger.debug("Closing {}@{}", getClass().getSimpleName(), Long.toHexString(pointer));
       }
       doClose(pointer);
     } else {
