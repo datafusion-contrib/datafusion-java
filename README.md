@@ -120,41 +120,46 @@ BUILD SUCCESSFUL in 2s
 First build the docker image:
 
 <details>
-<summary>docker build -t datafusion-java .</summary>
+<summary>docker build -t datafusion-example .</summary>
 
 ```text
-❯ docker build -t datafusion-java .
-[+] Building 3.6s (24/24) FINISHED
- => [internal] load build definition from Dockerfile                                                                 0.0s
- => => transferring dockerfile: 37B                                                                                  0.0s
- => [internal] load .dockerignore                                                                                    0.0s
- => => transferring context: 34B                                                                                     0.0s
- => [internal] load metadata for docker.io/library/openjdk:11-jdk-slim-bullseye                                      3.3s
- => [internal] load metadata for docker.io/library/debian:bullseye                                                   1.5s
- => [internal] load metadata for docker.io/library/openjdk:11-jdk-bullseye                                           0.0s
- => [internal] load build context                                                                                    0.1s
- => => transferring context: 599.56kB                                                                                0.1s
- => [rust-builder 1/6] FROM docker.io/library/debian:bullseye@sha256:2906804d2a64e8a13a434a1a127fe3f6a28bf7cf3696be  0.0s
- => [java-builder 1/7] FROM docker.io/library/openjdk:11-jdk-bullseye                                                0.0s
- => [stage-2 1/4] FROM docker.io/library/openjdk:11-jdk-slim-bullseye@sha256:5d1529573ab358fd46b823459bae966ca763ed  0.0s
- => CACHED [stage-2 2/4] WORKDIR /usr/opt/datafusion-java                                                            0.0s
- => CACHED [rust-builder 2/6] RUN apt-get update &&   apt-get -y install curl gcc &&   rm -rf /var/lib/apt/lists/*   0.0s
- => CACHED [rust-builder 3/6] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y            0.0s
- => CACHED [rust-builder 4/6] COPY datafusion-jni /usr/opt/datafusion-jni                                            0.0s
- => CACHED [rust-builder 5/6] WORKDIR /usr/opt/datafusion-jni                                                        0.0s
- => CACHED [rust-builder 6/6] RUN cargo build --release                                                              0.0s
- => CACHED [stage-2 3/4] COPY --from=rust-builder /usr/opt/datafusion-jni/target/release/libdatafusion_jni.so ./     0.0s
- => CACHED [java-builder 2/7] WORKDIR /usr/opt/datafusion-java                                                       0.0s
- => CACHED [java-builder 3/7] COPY build.gradle settings.gradle gradlew ./                                           0.0s
- => CACHED [java-builder 4/7] COPY gradle gradle                                                                     0.0s
- => CACHED [java-builder 5/7] RUN ./gradlew --version                                                                0.0s
- => CACHED [java-builder 6/7] COPY . .                                                                               0.0s
- => CACHED [java-builder 7/7] RUN ./gradlew installDist                                                              0.0s
- => CACHED [stage-2 4/4] COPY --from=java-builder /usr/opt/datafusion-java/datafusion-examples/build/install/datafu  0.0s
- => exporting to image                                                                                               0.0s
- => => exporting layers                                                                                              0.0s
- => => writing image sha256:eea330a6e9e2be4ac855ed31bdd1c81d52cd5e102e9fadce18ebed7e4104e87e                         0.0s
- => => naming to docker.io/library/datafusion-java                                                                   0.0s
+❯ docker build -t datafusion-example .
+[+] Building 615.2s (14/14) FINISHED
+ => [internal] load build definition from Dockerfile                                                     0.0s
+ => => transferring dockerfile: 598B                                                                     0.0s
+ => [internal] load .dockerignore                                                                        0.0s
+ => => transferring context: 81B                                                                         0.0s
+ => [internal] load metadata for docker.io/library/openjdk:11-jdk-slim-bullseye                          5.6s
+ => [internal] load build context                                                                       66.5s
+ => => transferring context: 4.01GB                                                                     66.0s
+ => [1/9] FROM docker.io/library/openjdk:11-jdk-slim-bullseye@sha256:0aac7dafc37d192d744228a6b26437438  22.3s
+ => => resolve docker.io/library/openjdk:11-jdk-slim-bullseye@sha256:0aac7dafc37d192d744228a6b264374389  0.0s
+ => => sha256:0aac7dafc37d192d744228a6b26437438908929883fc156b761ab779819e0fbd 549B / 549B               0.0s
+ => => sha256:452daa20005a0f380b34b3d71a89e06cd7007086945fe3434d2a30fc1002475c 1.16kB / 1.16kB           0.0s
+ => => sha256:7c8c5acc99dd425bd4b9cc46edc6f8b1fc7abd23cd5ea4c83d622d8ae1f2230f 5.60kB / 5.60kB           0.0s
+ => => sha256:214ca5fb90323fe769c63a12af092f2572bf1c6b300263e09883909fc865d260 31.38MB / 31.38MB         2.6s
+  1 update dockerfile, fix library path
+ => => sha256:ebf31789c5c1a5e3676cbd7a34472d61217c52c819552f5b116565c22cb6d2f1 1.58MB / 1.58MB           2.3s
+ => => sha256:8741521b2ba4d4d676c7a992cb54627c0eb9fdce1b4f68ad17da4f8b2abf103a 211B / 211B               2.5s
+ => => sha256:2b079b63f250d1049457d0657541b735a1915d4c4a5aa6686d172c3821e3ebc9 204.24MB / 204.24MB      16.3s
+ => => extracting sha256:214ca5fb90323fe769c63a12af092f2572bf1c6b300263e09883909fc865d260                2.7s
+ => => extracting sha256:ebf31789c5c1a5e3676cbd7a34472d61217c52c819552f5b116565c22cb6d2f1                0.3s
+ => => extracting sha256:8741521b2ba4d4d676c7a992cb54627c0eb9fdce1b4f68ad17da4f8b2abf103a                0.0s
+ => => extracting sha256:2b079b63f250d1049457d0657541b735a1915d4c4a5aa6686d172c3821e3ebc9                5.9s
+ => [2/9] RUN apt-get update &&   apt-get -y install curl gcc &&   rm -rf /var/lib/apt/lists/*          23.6s
+ => [3/9] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y                   29.6s
+ => [4/9] WORKDIR /usr/opt/datafusion-java                                                               0.0s
+ => [5/9] COPY build.gradle settings.gradle gradlew ./                                                   0.0s
+ => [6/9] COPY gradle gradle                                                                             0.0s
+ => [7/9] RUN ./gradlew --version                                                                        8.5s
+ => [8/9] COPY . .                                                                                       8.9s
+ => [9/9] RUN ./gradlew cargoReleaseBuild build installDist                                            494.7s
+ => exporting to image                                                                                  21.9s
+ => => exporting layers                                                                                 21.9s
+ => => writing image sha256:36cabc4e6c400adb4fa0b10f9c07c79aa9b50703bc76a5727d3e43f85cc76f36             0.0s
+ => => naming to docker.io/library/datafusion-example                                                    0.0s
+
+Use '                                                                  0.0s
 ```
 
 </details>
@@ -162,7 +167,7 @@ First build the docker image:
 Then run using Docker:
 
 <details>
-<summary>docker run --rm -it datafusion-java</summary>
+<summary>docker run --rm -it datafusion-example</summary>
 
 ```text
 Dec 27, 2021 2:52:22 AM java.util.prefs.FileSystemPreferences$1 run

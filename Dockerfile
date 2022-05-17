@@ -20,6 +20,6 @@ RUN ./gradlew --version
 
 COPY . .
 
-RUN ./gradlew cargoReleaseBuild build installDist
+RUN ./gradlew copyDevLibrary installDist
 
-ENTRYPOINT ["./datafusion-examples/build/install/datafusion-examples/bin/datafusion-examples"]
+CMD ["./datafusion-examples/build/install/datafusion-examples/bin/datafusion-examples"]
