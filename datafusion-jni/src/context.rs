@@ -134,7 +134,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_destroyS
 }
 
 #[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContextContexts_createSessionContext(
+pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_createSessionContext(
     _env: JNIEnv,
     _class: JClass,
 ) -> jlong {

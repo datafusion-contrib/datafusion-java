@@ -6,6 +6,7 @@ use jni::JNIEnv;
 use std::convert::Into;
 use std::io::BufWriter;
 use std::io::Cursor;
+use std::sync::Arc;
 use tokio::runtime::Runtime;
 
 #[no_mangle]
@@ -17,7 +18,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDatafr
     callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
-    let dataframe = unsafe { &mut *(dataframe as *mut DataFrame) };
+    let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
     let schema = dataframe.schema().into();
     runtime.block_on(async {
         let batches = dataframe
@@ -58,7 +59,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe
     callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
-    let dataframe = unsafe { &mut *(dataframe as *mut DataFrame) };
+    let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
     runtime.block_on(async {
         let r = dataframe.show().await;
         let err_message: JValue = match r {
