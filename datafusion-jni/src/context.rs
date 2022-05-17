@@ -1,5 +1,5 @@
 use datafusion::execution::context::SessionContext;
-use datafusion::prelude::CsvReadOptions;
+use datafusion::prelude::{CsvReadOptions, ParquetReadOptions};
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::jlong;
 use jni::JNIEnv;
@@ -64,7 +64,9 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
         .into();
     let context = unsafe { &mut *(pointer as *mut SessionContext) };
     runtime.block_on(async {
-        let register_result = context.register_parquet(&name, &path).await;
+        let register_result = context
+            .register_parquet(&name, &path, ParquetReadOptions::default())
+            .await;
         let err_message: JValue = match register_result {
             Ok(_) => JValue::Void,
             Err(err) => {
