@@ -3,19 +3,20 @@ package org.apache.arrow.datafusion;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 abstract class AbstractProxy implements AutoCloseable, NativeProxy {
-  private static final Logger logger = LogManager.getLogger(AbstractProxy.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractProxy.class);
   private final long pointer;
   private final AtomicBoolean closed;
   private final ConcurrentMap<Long, AbstractProxy> children;
 
   protected AbstractProxy(long pointer) {
     this.pointer = pointer;
-    logger.printf(Level.DEBUG, "Obtaining %s@%x", getClass().getSimpleName(), pointer);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Obtaining {}@{}", getClass().getSimpleName(), Long.toHexString(pointer));
+    }
     this.closed = new AtomicBoolean(false);
     this.children = new ConcurrentHashMap<>();
   }
@@ -47,7 +48,9 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
           child.close();
         }
       }
-      logger.printf(Level.DEBUG, "Closing %s@%x", getClass().getSimpleName(), pointer);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Closing {}@{}", getClass().getSimpleName(), Long.toHexString(pointer));
+      }
       doClose(pointer);
     } else {
       logger.warn("Failed to close {}, maybe already closed?", getPointer());
