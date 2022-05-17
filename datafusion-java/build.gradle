@@ -9,7 +9,6 @@ plugins {
 
 dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.36'
-    implementation 'org.apache.arrow:arrow-c-data:8.0.0'
     implementation 'org.apache.arrow:arrow-format:8.0.0'
     implementation 'org.apache.arrow:arrow-vector:8.0.0'
     runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:8.0.0'
