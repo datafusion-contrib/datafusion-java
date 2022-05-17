@@ -13,20 +13,21 @@ final class JNILoader {
 
   private static final AtomicBoolean loaded = new AtomicBoolean(false);
 
-  private static final String libraryName = "datafusion_jni";
-  private static final String ERROR_MSG =
-      String.format(
-          "Unsupported OS/arch, cannot find %s or load %s from system libraries. Please try building from source the jar or providing %s in your system.",
-          getResourceName(), libraryName, libraryName);
-
   private enum OsName {
     Windows,
     Osx,
-    Linux;
+    Linux
   }
 
   private static final Map<OsName, String> OS_NAME_STRING_MAP =
       Map.of(OsName.Linux, "so", OsName.Osx, "dylib", OsName.Windows, "dll");
+  private static final String libraryName = "datafusion_jni";
+
+  private static final String ERROR_MSG =
+      String.format(
+          "Unsupported OS/arch (`%s' detected), cannot find `%s' or load `%s' from system libraries. "
+              + "Please try building from source the jar or providing %s in your system.",
+          getOsName(), getResourceName(), libraryName, libraryName);
 
   private static OsName getOsName() {
     String os = System.getProperty("os.name").toLowerCase().replace(' ', '_');

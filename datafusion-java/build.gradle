@@ -36,7 +36,13 @@ javadoc {
     }
 }
 
-task cargoReleaseBuild(type: Exec) {
+tasks.register('cargoDevBuild', Exec) {
+    workingDir "$rootDir/datafusion-jni"
+    executable "${System.getProperty('user.home')}/.cargo/bin/cargo"
+    args += ['build']
+}
+
+tasks.register('cargoReleaseBuild', Exec) {
     workingDir "$rootDir/datafusion-jni"
     executable "${System.getProperty('user.home')}/.cargo/bin/cargo"
     args += ['build', '--release']
@@ -48,7 +54,14 @@ def extensionMapping = [
         "windows": "dll"
 ]
 
-task copyBuiltLibrary(type: Copy) {
+tasks.register('copyDevLibrary', Sync) {
+    def extension = extensionMapping[osdetector.os]
+    from "${rootDir}/datafusion-jni/target/debug/libdatafusion_jni.$extension"
+    into layout.buildDirectory.dir("jni_libs/dev")
+    dependsOn cargoDevBuild
+}
+
+tasks.register('copyBuiltLibrary', Copy) {
     def extension = extensionMapping[osdetector.os]
     from "${rootDir}/datafusion-jni/target/release/libdatafusion_jni.$extension"
     into layout.buildDirectory.dir("jni_libs/${osdetector.classifier}")
@@ -63,21 +76,21 @@ def classifierLinux = 'linux-x86_64'
 def extensionLinux = 'so'
 def jniLibLinux = layout.buildDirectory.file("jni_libs/$classifierLinux/libdatafusion_jni.$extensionLinux")
 
-task jarWithOsxLib(type: Jar) {
+tasks.register('jarWithOsxLib', Jar) {
     from sourceSets.main.output
     from jniLibOsx
     rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
     archiveClassifier.set(classifierOsx)
 }
 
-task jarWithLinuxLib(type: Jar) {
+tasks.register('jarWithLinuxLib', Jar) {
     from sourceSets.main.output
     from jniLibLinux
     rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
     archiveClassifier.set(classifierLinux)
 }
 
-task jarWithLib(type: Jar) {
+tasks.register('jarWithLib', Jar) {
     from sourceSets.main.output
     from jniLibOsx
     rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
