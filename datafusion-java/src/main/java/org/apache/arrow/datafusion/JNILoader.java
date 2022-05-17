@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +22,6 @@ final class JNILoader {
     Linux
   }
 
-  private static final Map<OsName, String> OS_NAME_STRING_MAP =
-      Map.of(OsName.Linux, "so", OsName.Osx, "dylib", OsName.Windows, "dll");
   private static final String libraryName = "datafusion_jni";
 
   private static final String ERROR_MSG =
@@ -49,7 +46,15 @@ final class JNILoader {
   }
 
   private static String getExtension() {
-    return OS_NAME_STRING_MAP.get(getOsName());
+    OsName osName = getOsName();
+    if (osName == OsName.Linux) {
+      return "so";
+    } else if (osName == OsName.Osx) {
+      return "dylib";
+    } else if (osName == OsName.Windows) {
+      return "dll";
+    }
+    throw new IllegalStateException("Cannot determin extension for " + osName);
   }
 
   static synchronized void load() {
