@@ -41,8 +41,11 @@ final class JNILoader {
     }
   }
 
+  /**
+   * @return the absolute path in the jar file for the jni library
+   */
   private static String getResourceName() {
-    return String.format("lib%s.%s", libraryName, getExtension());
+    return String.format("/jni_libs/lib%s.%s", libraryName, getExtension());
   }
 
   private static String getExtension() {
@@ -54,7 +57,7 @@ final class JNILoader {
     } else if (osName == OsName.Windows) {
       return "dll";
     }
-    throw new IllegalStateException("Cannot determin extension for " + osName);
+    throw new IllegalStateException("Cannot determine the extension for " + osName);
   }
 
   static synchronized void load() {
@@ -62,8 +65,7 @@ final class JNILoader {
       logger.debug("{} already loaded, returning", libraryName);
       return;
     }
-    String resourceName = getResourceName();
-    InputStream is = JNILoader.class.getResourceAsStream(resourceName);
+    InputStream is = JNILoader.class.getResourceAsStream(getResourceName());
     if (is == null) {
       try {
         System.loadLibrary(libraryName);
