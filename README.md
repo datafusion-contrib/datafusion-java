@@ -226,7 +226,7 @@ Note you must have local Rust and Java environment setup.
 Run the example in one line:
 
 ```bash
-./gradlew cargoReleaseBuild run
+./gradlew run
 ```
 
 Or roll your own test example:

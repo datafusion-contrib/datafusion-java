@@ -22,4 +22,10 @@ dependencies {
 
 application {
     mainClass = 'org.apache.arrow.datafusion.examples.ExampleMain'
+    def libraryPath = findProperty("JNI_PATH") ?: "$rootDir/datafusion-java/build/jni_libs/dev"
+    applicationDefaultJvmArgs += "-Djava.library.path=$libraryPath"
+}
+
+tasks.named("run").configure {
+    dependsOn(":datafusion-java:copyDevLibrary")
 }
