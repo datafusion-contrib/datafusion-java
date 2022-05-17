@@ -36,15 +36,17 @@ javadoc {
     }
 }
 
+def cargoBinary = "${System.getProperty('user.home')}/.cargo/bin/cargo"
+
 tasks.register('cargoDevBuild', Exec) {
     workingDir "$rootDir/datafusion-jni"
-    executable "${System.getProperty('user.home')}/.cargo/bin/cargo"
+    executable cargoBinary
     args += ['build']
 }
 
 tasks.register('cargoReleaseBuild', Exec) {
     workingDir "$rootDir/datafusion-jni"
-    executable "${System.getProperty('user.home')}/.cargo/bin/cargo"
+    executable cargoBinary
     args += ['build', '--release']
 }
 
