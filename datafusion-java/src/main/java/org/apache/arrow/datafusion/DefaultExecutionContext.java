@@ -3,12 +3,12 @@ package org.apache.arrow.datafusion;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class DefaultExecutionContext extends AbstractProxy implements ExecutionContext {
 
-  private static final Logger logger = LogManager.getLogger(DefaultExecutionContext.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultExecutionContext.class);
 
   static native void querySql(
       long runtime, long context, String sql, ObjectResultCallback callback);

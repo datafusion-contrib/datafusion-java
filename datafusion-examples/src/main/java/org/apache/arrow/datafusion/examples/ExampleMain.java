@@ -12,13 +12,12 @@ import org.apache.arrow.vector.BigIntVector;
 import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.ipc.ArrowReader;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExampleMain {
 
-  private static final Logger logger = LogManager.getLogger(ExampleMain.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExampleMain.class);
 
   public static void main(String[] args) throws Exception {
     try (ExecutionContext context = ExecutionContexts.create();
@@ -70,7 +69,7 @@ public class ExampleMain {
         .sql("select 1 + 2")
         .thenComposeAsync(
             dataFrame -> {
-              logger.printf(Level.INFO, "successfully loaded data frame %s", dataFrame);
+              logger.info("successfully loaded data frame {}", dataFrame);
               return dataFrame.show();
             });
   }

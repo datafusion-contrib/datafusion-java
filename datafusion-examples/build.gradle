@@ -12,11 +12,9 @@ spotless {
 
 dependencies {
     implementation project(':datafusion-java')
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
-    // https://mvnrepository.com/artifact/org.apache.arrow/arrow-format
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
     implementation 'org.apache.arrow:arrow-format:7.0.0'
-    // https://mvnrepository.com/artifact/org.apache.arrow/arrow-vector
     implementation 'org.apache.arrow:arrow-vector:7.0.0'
 }
 

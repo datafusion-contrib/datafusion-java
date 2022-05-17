@@ -5,12 +5,12 @@ import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.ipc.ArrowFileReader;
 import org.apache.arrow.vector.ipc.ArrowReader;
 import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class DefaultDataFrame extends AbstractProxy implements DataFrame {
 
-  private static final Logger logger = LogManager.getLogger(DefaultDataFrame.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultDataFrame.class);
   private final ExecutionContext context;
 
   DefaultDataFrame(ExecutionContext context, long pointer) {
