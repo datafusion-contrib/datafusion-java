@@ -52,7 +52,7 @@ task copyBuiltLibrary(type: Copy) {
     def extension = extensionMapping[osdetector.os]
     from "${rootDir}/datafusion-jni/target/release/libdatafusion_jni.$extension"
     into layout.buildDirectory.dir("jni_libs/${osdetector.classifier}")
-    // dependsOn cargoReleaseBuild
+    dependsOn cargoReleaseBuild
 }
 
 def classifierOsx = 'osx-x86_64'
@@ -68,7 +68,6 @@ task jarWithOsxLib(type: Jar) {
     from jniLibOsx
     rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
     archiveClassifier.set(classifierOsx)
-    dependsOn copyBuiltLibrary
 }
 
 task jarWithLinuxLib(type: Jar) {
@@ -76,7 +75,6 @@ task jarWithLinuxLib(type: Jar) {
     from jniLibLinux
     rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
     archiveClassifier.set(classifierLinux)
-    dependsOn copyBuiltLibrary
 }
 
 task jarWithLib(type: Jar) {
@@ -85,7 +83,6 @@ task jarWithLib(type: Jar) {
     rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
     from jniLibLinux
     rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
-    dependsOn copyBuiltLibrary
 }
 
 publishing {
