@@ -1,14 +1,14 @@
 name: Release
 on:
   release:
-    types: [ created ]
+    types: [created]
   push:
-    branches: [ main ]
+    branches: [main]
 jobs:
   rust:
     strategy:
       matrix:
-        os: [ "ubuntu-latest", "macos-latest" ]
+        os: ["ubuntu-latest", "macos-latest"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -72,19 +72,22 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: datafusion-jni-ubuntu-latest
-          path: datafusion-jni/target/release
+          path: datafusion-java/build/jni_libs/linux-x86_64
 
-      #      - name: Download windows artifacts
-      #        uses: actions/download-artifact@v3
-      #        with:
-      #          name: datafusion-jni-windows-latest
-      #          path: datafusion-jni/target/release
+      #  - name: Download windows artifacts
+      #    uses: actions/download-artifact@v3
+      #    with:
+      #      name: datafusion-jni-windows-latest
+      #      path: datafusion-jni/target/release
 
       - name: Download macos artifacts
         uses: actions/download-artifact@v3
         with:
           name: datafusion-jni-macos-latest
-          path: datafusion-jni/target/release
+          path: datafusion-java/build/jni_libs/osx-x86_64
+
+      - name: List downloaded artifacts
+        run: tree datafusion-java/build/jni_libs
 
       - name: Publish to Sonatype
         run: ./gradlew publish

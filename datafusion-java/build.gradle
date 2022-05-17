@@ -37,97 +37,85 @@ javadoc {
 }
 
 task cargoReleaseBuild(type: Exec) {
-    workingDir '../datafusion-jni'
+    workingDir "$rootDir/datafusion-jni"
     executable "${System.getProperty('user.home')}/.cargo/bin/cargo"
     args += ['build', '--release']
 }
 
-@SuppressWarnings('GrMethodMayBeStatic')
-String getLibExtension() {
-    if (osdetector.os == "windows") {
-        return "dll"
-    } else if (osdetector.os == "linux") {
-        return "so"
-    } else if (osdetector.os == "osx") {
-        return "dylib"
-    } else {
-        throw new GradleException("Unsupported OS ${osdetector.os}")
-    }
+def extensionMapping = [
+        "osx"    : "dylib",
+        "linux"  : "so",
+        "windows": "dll"
+]
+
+task copyBuiltLibrary(type: Copy) {
+    def extension = extensionMapping[osdetector.os]
+    from "${rootDir}/datafusion-jni/target/release/libdatafusion_jni.$extension"
+    into layout.buildDirectory.dir("jni_libs/${osdetector.classifier}")
+    dependsOn cargoReleaseBuild
 }
 
-PublishArtifact getArtifact(String extension, String classifier) {
-    def jniFile = layout.buildDirectory.file("../../datafusion-jni/target/release/libdatafusion_jni.$extension")
-    return artifacts.add('archives', jniFile.get().asFile) {
-        type = extension
-        extension = extension
-        classifier = classifier
-    }
+def classifierOsx = 'osx-x86_64'
+def extensionOsx = 'dylib'
+def jniLibOsx = layout.buildDirectory.file("jni_libs/$classifierOsx/libdatafusion_jni.$extensionOsx")
+
+def classifierLinux = 'linux-x86_64'
+def extensionLinux = 'so'
+def jniLibLinux = layout.buildDirectory.file("jni_libs/$classifierLinux/libdatafusion_jni.$extensionLinux")
+
+task jarWithOsxLib(type: Jar) {
+    from sourceSets.main.output
+    from jniLibOsx
+    rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
+    archiveClassifier.set(classifierOsx)
+}
+
+task jarWithLinuxLib(type: Jar) {
+    from sourceSets.main.output
+    from jniLibLinux
+    rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
+    archiveClassifier.set(classifierLinux)
+}
+
+task jarWithLib(type: Jar) {
+    from sourceSets.main.output
+    from jniLibOsx
+    rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
+    from jniLibLinux
+    rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
 }
 
 publishing {
     publications {
-        def artifactId = 'datafusion-java'
-        if (System.getenv("CI") != null) {
-            mavenJava(MavenPublication) {
-                artifactId
-                from(components.java)
-                artifact getArtifact("so", "linux-x86_64")
-                artifact getArtifact("dylib", "osx-x86_64")
-                pom {
-                    name = 'DataFusion Java'
-                    description = 'A Java binding to Apache Arrow DataFusion library'
-                    url = 'https://github.com/datafusion-contrib/datafusion-java'
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'dev'
-                            name = 'Apache Arrow Developers'
-                            email = 'dev@arrow.apache.org'
-                        }
-                    }
-                    scm {
-                        connection = 'scm:git:git@github.com:datafusion-contrib/datafusion-java.git'
-                        developerConnection = 'scm:git:https://github.com/datafusion-contrib/datafusion-java.git'
-                        url = 'https://github.com/datafusion-contrib/datafusion-java'
+        mavenJava(MavenPublication) {
+            artifactId 'datafusion-java'
+            artifact sourcesJar
+            artifact javadocJar
+            artifact jarWithLib
+            pom {
+                name = 'DataFusion Java'
+                description = 'A Java binding to Apache Arrow DataFusion library'
+                url = 'https://github.com/datafusion-contrib/datafusion-java'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
-            }
-        } else {
-            mavenJava(MavenPublication) {
-                artifactId
-                from(components.java)
-                artifact getArtifact(getLibExtension(), osdetector.classifier)
-                pom {
-                    name = 'DataFusion Java'
-                    description = 'A Java binding to Apache Arrow DataFusion library'
+                developers {
+                    developer {
+                        id = 'dev'
+                        name = 'Apache Arrow Developers'
+                        email = 'dev@arrow.apache.org'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git@github.com:datafusion-contrib/datafusion-java.git'
+                    developerConnection = 'scm:git:https://github.com/datafusion-contrib/datafusion-java.git'
                     url = 'https://github.com/datafusion-contrib/datafusion-java'
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'dev'
-                            name = 'Apache Arrow Developers'
-                            email = 'dev@arrow.apache.org'
-                        }
-                    }
-                    scm {
-                        connection = 'scm:git:git@github.com:datafusion-contrib/datafusion-java.git'
-                        developerConnection = 'scm:git:https://github.com/datafusion-contrib/datafusion-java.git'
-                        url = 'https://github.com/datafusion-contrib/datafusion-java'
-                    }
                 }
             }
         }
-
     }
     repositories {
         maven {
@@ -136,12 +124,23 @@ publishing {
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = System.getenv("MAVEN_USERNAME") != null ? System.getenv("MAVEN_USERNAME") : findProperty('ossrhUsername')
-                password = System.getenv("MAVEN_PASSWORD") != null ? System.getenv("MAVEN_PASSWORD") : findProperty('ossrhPassword')
+                username = findProperty('ossrhUsername') ?: System.getenv("MAVEN_USERNAME")
+                password = findProperty('ossrhPassword') ?: System.getenv("MAVEN_PASSWORD")
             }
         }
     }
 }
+
+def artifacts = publishing.publications.mavenJava.artifacts
+
+if (jniLibLinux.get().asFile.exists()) {
+    artifacts.artifact jarWithLinuxLib
+}
+
+if (jniLibOsx.get().asFile.exists()) {
+    artifacts.artifact jarWithOsxLib
+}
+
 
 signing {
     required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
