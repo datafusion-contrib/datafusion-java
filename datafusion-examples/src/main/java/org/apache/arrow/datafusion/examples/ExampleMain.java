@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.datafusion.DataFrame;
-import org.apache.arrow.datafusion.ExecutionContext;
-import org.apache.arrow.datafusion.ExecutionContexts;
+import org.apache.arrow.datafusion.SessionContext;
+import org.apache.arrow.datafusion.SessionContexts;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.BigIntVector;
@@ -20,7 +20,7 @@ public class ExampleMain {
   private static final Logger logger = LoggerFactory.getLogger(ExampleMain.class);
 
   public static void main(String[] args) throws Exception {
-    try (ExecutionContext context = ExecutionContexts.create();
+    try (SessionContext context = SessionContexts.create();
         BufferAllocator allocator = new RootAllocator()) {
       loadConstant(context).join();
 
@@ -64,7 +64,7 @@ public class ExampleMain {
     }
   }
 
-  private static CompletableFuture<Void> loadConstant(ExecutionContext context) {
+  private static CompletableFuture<Void> loadConstant(SessionContext context) {
     return context
         .sql("select 1 + 2")
         .thenComposeAsync(

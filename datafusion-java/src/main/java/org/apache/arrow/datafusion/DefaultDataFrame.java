@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 class DefaultDataFrame extends AbstractProxy implements DataFrame {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultDataFrame.class);
-  private final ExecutionContext context;
+  private final SessionContext context;
 
-  DefaultDataFrame(ExecutionContext context, long pointer) {
+  DefaultDataFrame(SessionContext context, long pointer) {
     super(pointer);
     this.context = context;
   }
