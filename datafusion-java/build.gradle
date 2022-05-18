@@ -98,7 +98,7 @@ tasks.register('jarWithLinuxLib', Jar) {
 tasks.register('jarWithWindowsLib', Jar) {
     from sourceSets.main.output
     from jniLibWindows
-    rename "libdatafusion_jni.$extensionWindows", "jni_libs/datafusion_jni.$extensionWindows"
+    rename "datafusion_jni.$extensionWindows", "jni_libs/datafusion_jni.$extensionWindows"
     archiveClassifier.set(classifierWindows)
 }
 
