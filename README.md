@@ -14,14 +14,14 @@ where Java 17 `jshell` is used to run interactively.
 
 ## How to use in your code
 
-The artifacts are [published][1] to maven central, so you can use like any normal Java libraries:
+The artifacts are [published][2] to maven central, so you can use like any normal Java libraries:
 
 ```groovy
 dependencies {
     implementation(
         group = "io.github.datafusion-contrib",
         name = "datafusion-java",
-        version = "0.9.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
+        version = "0.11.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
     )
 }
 ```
