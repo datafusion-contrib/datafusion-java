@@ -67,7 +67,6 @@ repositories {
 tasks {
   application {
     mainClass.set("com.me.DataFusionDemo")
-    applicationDefaultJvmArgs += "-Djava.library.path=/Users/me/libraries/"
   }
 }
 
