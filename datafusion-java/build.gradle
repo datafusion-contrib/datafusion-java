@@ -77,6 +77,10 @@ def classifierLinux = 'linux-x86_64'
 def extensionLinux = 'so'
 def jniLibLinux = layout.buildDirectory.file("jni_libs/$classifierLinux/libdatafusion_jni.$extensionLinux")
 
+def classifierWindows = "windows-x86_64"
+def extensionWindows = "dll"
+def jniLibWindows = layout.buildDirectory.file("jni_libs/$classifierWindows/datafusion_jni.$extensionWindows")
+
 tasks.register('jarWithOsxLib', Jar) {
     from sourceSets.main.output
     from jniLibOsx
@@ -91,12 +95,21 @@ tasks.register('jarWithLinuxLib', Jar) {
     archiveClassifier.set(classifierLinux)
 }
 
+tasks.register('jarWithWindowsLib', Jar) {
+    from sourceSets.main.output
+    from jniLibWindows
+    rename "libdatafusion_jni.$extensionWindows", "jni_libs/datafusion_jni.$extensionWindows"
+    archiveClassifier.set(classifierWindows)
+}
+
 tasks.register('jarWithLib', Jar) {
     from sourceSets.main.output
     from jniLibOsx
     rename "libdatafusion_jni.$extensionOsx", "jni_libs/libdatafusion_jni.$extensionOsx"
     from jniLibLinux
     rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
+    from jniLibWindows
+    rename "libdatafusion_jni.$extensionWindows", "jni_libs/datafusion_jni.$extensionWindows"
 }
 
 publishing {
@@ -153,6 +166,10 @@ if (jniLibLinux.get().asFile.exists()) {
 
 if (jniLibOsx.get().asFile.exists()) {
     artifacts.artifact jarWithOsxLib
+}
+
+if (jniLibWindows.get().asFile.exists()) {
+    artifacts.artifact jarWithWindowsLib
 }
 
 
