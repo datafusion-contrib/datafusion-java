@@ -41,11 +41,18 @@ final class JNILoader {
     }
   }
 
+  private static String getLibraryFileName() {
+    String prefix = "lib";
+    if (getOsName() == OsName.Windows) {
+      prefix = "";
+    }
+    return prefix + libraryName + "." + getExtension();
+  }
   /**
    * @return the absolute path in the jar file for the jni library
    */
   private static String getResourceName() {
-    return String.format("/jni_libs/lib%s.%s", libraryName, getExtension());
+    return "/jni_libs/" + getLibraryFileName();
   }
 
   private static String getExtension() {
@@ -110,7 +117,7 @@ final class JNILoader {
     }
     try (InputStream in = is;
         FileOutputStream out = new FileOutputStream(tempFile)) {
-      byte[] buf = new byte[4096];
+      byte[] buf = new byte[8192];
       while (true) {
         int read = in.read(buf);
         if (read == -1) {
