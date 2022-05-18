@@ -1,5 +1,6 @@
 package org.apache.arrow.datafusion;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.ipc.ArrowReader;
@@ -18,7 +19,7 @@ public interface DataFrame extends NativeProxy {
    * @return {@link ArrowReader reader} instance to extract the data, you are expected to {@link
    *     ArrowReader#close()} it after usage to release memory
    */
-  CompletableFuture<ArrowReader> collect(BufferAllocator allocator);
+  CompletableFuture<List<RecordBatch>> collect();
 
   /**
    * Print results.
