@@ -109,7 +109,7 @@ tasks.register('jarWithLib', Jar) {
     from jniLibLinux
     rename "libdatafusion_jni.$extensionLinux", "jni_libs/libdatafusion_jni.$extensionLinux"
     from jniLibWindows
-    rename "libdatafusion_jni.$extensionWindows", "jni_libs/datafusion_jni.$extensionWindows"
+    rename "datafusion_jni.$extensionWindows", "jni_libs/datafusion_jni.$extensionWindows"
 }
 
 publishing {
