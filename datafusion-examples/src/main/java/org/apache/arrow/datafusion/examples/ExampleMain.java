@@ -2,8 +2,10 @@ package org.apache.arrow.datafusion.examples;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.datafusion.DataFrame;
+import org.apache.arrow.datafusion.RecordBatch;
 import org.apache.arrow.datafusion.SessionContext;
 import org.apache.arrow.datafusion.SessionContexts;
 import org.apache.arrow.memory.BufferAllocator;
@@ -41,7 +43,8 @@ public class ExampleMain {
     }
   }
 
-  private static void consumeReader(ArrowReader reader) {
+  private static void consumeReader(List<RecordBatch> batches) {
+
     try {
       VectorSchemaRoot root = reader.getVectorSchemaRoot();
       while (reader.loadNextBatch()) {

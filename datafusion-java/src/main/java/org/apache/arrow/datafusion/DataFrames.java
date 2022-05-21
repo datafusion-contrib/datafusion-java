@@ -13,5 +13,5 @@ final class DataFrames {
   static native void showDataframe(long runtime, long dataframe, Consumer<String> callback);
 
   static native void collectDataframe(
-      long runtime, long dataframe, BiConsumer<String, byte[]> callback);
+      long runtime, long dataframe, BiConsumer<String, long[]> callback);
 }
