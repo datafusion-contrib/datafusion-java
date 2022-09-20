@@ -1,5 +1,6 @@
 package org.apache.arrow.datafusion;
 
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.ipc.ArrowFileReader;
@@ -53,6 +54,46 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
     DataFrames.showDataframe(
         runtimePointer,
         dataframe,
+        (String errString) -> {
+          if (containsError(errString)) {
+            future.completeExceptionally(new RuntimeException(errString));
+          } else {
+            future.complete(null);
+          }
+        });
+    return future;
+  }
+
+  @Override
+  public CompletableFuture<Void> writeParquet(Path path) {
+    Runtime runtime = context.getRuntime();
+    long runtimePointer = runtime.getPointer();
+    long dataframe = getPointer();
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    DataFrames.writeParquet(
+        runtimePointer,
+        dataframe,
+        path.toAbsolutePath().toString(),
+        (String errString) -> {
+          if (containsError(errString)) {
+            future.completeExceptionally(new RuntimeException(errString));
+          } else {
+            future.complete(null);
+          }
+        });
+    return future;
+  }
+
+  @Override
+  public CompletableFuture<Void> writeCsv(Path path) {
+    Runtime runtime = context.getRuntime();
+    long runtimePointer = runtime.getPointer();
+    long dataframe = getPointer();
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    DataFrames.writeCsv(
+        runtimePointer,
+        dataframe,
+        path.toAbsolutePath().toString(),
         (String errString) -> {
           if (containsError(errString)) {
             future.completeExceptionally(new RuntimeException(errString));

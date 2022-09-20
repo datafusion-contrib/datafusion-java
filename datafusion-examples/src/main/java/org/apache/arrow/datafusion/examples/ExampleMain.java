@@ -38,6 +38,16 @@ public class ExampleMain {
           .thenComposeAsync(df -> df.collect(allocator))
           .thenAccept(ExampleMain::consumeReader)
           .join();
+
+      context
+          .sql("select * from test_parquet limit 3")
+          .thenComposeAsync(df -> df.writeCsv(Paths.get("build/tmp/csv-out")))
+          .join();
+
+      context
+          .sql("select * from test_parquet limit 3")
+          .thenComposeAsync(df -> df.writeParquet(Paths.get("build/tmp/parquet-out")))
+          .join();
     }
   }
 

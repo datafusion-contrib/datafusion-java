@@ -14,4 +14,10 @@ final class DataFrames {
 
   static native void collectDataframe(
       long runtime, long dataframe, BiConsumer<String, byte[]> callback);
+
+  static native void writeParquet(
+          long runtime, long dataframe, String path, Consumer<String> callback);
+
+  static native void writeCsv(
+          long runtime, long dataframe, String path, Consumer<String> callback);
 }

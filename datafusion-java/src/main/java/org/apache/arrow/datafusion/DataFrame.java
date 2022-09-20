@@ -1,5 +1,6 @@
 package org.apache.arrow.datafusion;
 
+import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.ipc.ArrowReader;
@@ -26,4 +27,19 @@ public interface DataFrame extends NativeProxy {
    * @return null
    */
   CompletableFuture<Void> show();
+
+  /**
+   * Write results to a parquet file.
+   *
+   * @param path path to write parquet file to
+   * @return null
+   */
+  CompletableFuture<Void> writeParquet(Path path);
+
+  /**
+   * Write results to a csv file.
+   * @param path path to write csv file to
+   * @return null
+   */
+  CompletableFuture<Void> writeCsv(Path path);
 }
