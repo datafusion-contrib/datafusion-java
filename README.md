@@ -21,7 +21,7 @@ dependencies {
     implementation(
         group = "io.github.datafusion-contrib",
         name = "datafusion-java",
-        version = "0.11.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
+        version = "0.12.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
     )
 }
 ```
@@ -74,7 +74,7 @@ dependencies {
   implementation(
     group = "io.github.datafusion-contrib",
     name = "datafusion-java",
-    version = "0.7.1"
+    version = "0.12.0"
   )
 }
 
