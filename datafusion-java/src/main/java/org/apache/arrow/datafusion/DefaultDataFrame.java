@@ -115,13 +115,13 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
           dataframe,
           contextPointer,
           name,
-            (String errString) -> {
-                if (containsError(errString)) {
-                    future.completeExceptionally(new RuntimeException(errString));
-                } else {
-                    future.complete(null);
-                }
-            });
+          (String errString) -> {
+            if (containsError(errString)) {
+              future.completeExceptionally(new RuntimeException(errString));
+            } else {
+              future.complete(null);
+            }
+          });
       return future;
   }
 
