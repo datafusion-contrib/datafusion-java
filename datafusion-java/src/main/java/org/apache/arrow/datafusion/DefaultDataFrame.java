@@ -104,6 +104,27 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
     return future;
   }
 
+  public CompletableFuture<Void> registerTable(SessionContext ctx, String name) {
+      Runtime runtime = context.getRuntime();
+      long runtimePointer = runtime.getPointer();
+      long dataframe = getPointer();
+      long contextPointer = ctx.getPointer();
+      CompletableFuture<Void> future = new CompletableFuture<>();
+      DataFrames.registerTable(
+          runtimePointer,
+          dataframe,
+          contextPointer,
+          name,
+            (String errString) -> {
+                if (containsError(errString)) {
+                    future.completeExceptionally(new RuntimeException(errString));
+                } else {
+                    future.complete(null);
+                }
+            });
+      return future;
+  }
+
   @Override
   void doClose(long pointer) {
     DataFrames.destroyDataFrame(pointer);
