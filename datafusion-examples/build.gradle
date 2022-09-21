@@ -13,15 +13,15 @@ spotless {
 dependencies {
     implementation project(':datafusion-java')
     implementation 'org.slf4j:slf4j-api:1.7.36'
-    implementation 'ch.qos.logback:logback-classic:1.2.11'
-    implementation 'org.apache.arrow:arrow-format:8.0.0'
-    implementation 'org.apache.arrow:arrow-vector:8.0.0'
+    implementation 'ch.qos.logback:logback-classic:1.4.0'
+    implementation 'org.apache.arrow:arrow-format:9.0.0'
+    implementation 'org.apache.arrow:arrow-vector:9.0.0'
 }
 
 application {
     mainClass = 'org.apache.arrow.datafusion.examples.ExampleMain'
     def libraryPath = findProperty("JNI_PATH") ?: "$rootDir/datafusion-java/build/jni_libs/dev"
-    applicationDefaultJvmArgs += "-Djava.library.path=$libraryPath"
+    applicationDefaultJvmArgs += ["-Djava.library.path=$libraryPath", "--add-opens=java.base/java.nio=ALL-UNNAMED"]
 }
 
 tasks.named("run").configure {
