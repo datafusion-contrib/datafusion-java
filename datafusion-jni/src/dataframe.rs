@@ -7,6 +7,7 @@ use std::convert::Into;
 use std::io::BufWriter;
 use std::io::Cursor;
 use std::sync::Arc;
+use datafusion::prelude::SessionContext;
 use tokio::runtime::Runtime;
 
 #[no_mangle]
@@ -134,6 +135,44 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeCsv(
         .into();
     runtime.block_on(async {
         let r = dataframe.write_csv(&path).await;
+        let err_message: JValue = match r {
+            Ok(_) => JValue::Void,
+            Err(err) => {
+                let err_message = env
+                    .new_string(err.to_string())
+                    .expect("Couldn't create java string!");
+                err_message.into()
+            }
+        };
+        env.call_method(
+            callback,
+            "accept",
+            "(Ljava/lang/Object;)V",
+            &[err_message.into()],
+        )
+        .expect("failed to call method");
+    });
+}
+
+#[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_registerTable(
+    env: JNIEnv,
+    _class: JClass,
+    runtime: jlong,
+    dataframe: jlong,
+    session: jlong,
+    name: JString,
+    callback: JObject,
+) {
+    let runtime = unsafe { &mut *(runtime as *mut Runtime) };
+    let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
+    let context = unsafe { &mut *(session as *mut SessionContext) };
+    let name: String = env
+        .get_string(name)
+        .expect("Couldn't get name as string!")
+        .into();
+    runtime.block_on(async {
+        let r = context.register_table(name.as_str(), dataframe.clone());
         let err_message: JValue = match r {
             Ok(_) => JValue::Void,
             Err(err) => {

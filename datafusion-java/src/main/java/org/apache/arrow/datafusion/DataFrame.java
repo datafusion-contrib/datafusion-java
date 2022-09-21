@@ -43,4 +43,12 @@ public interface DataFrame extends NativeProxy {
    * @return null
    */
   CompletableFuture<Void> writeCsv(Path path);
+
+  /**
+   * Register this dataframe as a temporary table.
+   * @param context SessionContext to register table to
+   * @param name name of the tmp table
+   * @return null
+   */
+  CompletableFuture<Void> registerTable(SessionContext context, String name);
 }

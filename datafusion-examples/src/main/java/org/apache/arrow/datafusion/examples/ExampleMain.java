@@ -33,7 +33,7 @@ public class ExampleMain {
           .registerParquet(
               "test_parquet", Paths.get("src/main/resources/aggregate_test_100.parquet"))
           .join();
-      context.sql("select * from test_parquet limit 3").thenComposeAsync(DataFrame::show).join();
+      context.sql("select * from test_parquet limit 5").thenComposeAsync(DataFrame::show).join();
 
       context
           .sql("select * from test_csv")
@@ -52,6 +52,13 @@ public class ExampleMain {
           .sql("select * from test_parquet limit 3")
           .thenComposeAsync(df -> df.writeParquet(tempPath.resolve("parquet-out")))
           .join();
+
+      context
+          .sql("select * from test_parquet limit 3")
+          .thenComposeAsync(df -> df.registerTable(context, "test_parquet_limited"))
+          .join();
+
+      context.sql("select * from test_parquet_limited").thenComposeAsync(DataFrame::show).join();
     }
   }
 
