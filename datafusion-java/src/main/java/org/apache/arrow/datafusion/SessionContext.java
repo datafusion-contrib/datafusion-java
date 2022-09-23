@@ -15,6 +15,8 @@ public interface SessionContext extends AutoCloseable, NativeProxy {
   /** Registering a parquet file with the context */
   CompletableFuture<Void> registerParquet(String name, Path path);
 
+  CompletableFuture<Void> deregisterTable(String name);
+
   /** Get the runtime associated with this context */
   Runtime getRuntime();
 }

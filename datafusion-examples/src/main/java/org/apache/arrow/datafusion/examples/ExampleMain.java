@@ -59,6 +59,12 @@ public class ExampleMain {
           .join();
 
       context.sql("select * from test_parquet_limited").thenComposeAsync(DataFrame::show).join();
+
+      context.deregisterTable("test_parquet_limited").join();
+
+      // We could no longer query the table after the deregistration,
+      // and the following query will fail due to table not found.
+      // context.sql("select * from test_parquet_limited").thenComposeAsync(DataFrame::show).join();
     }
   }
 

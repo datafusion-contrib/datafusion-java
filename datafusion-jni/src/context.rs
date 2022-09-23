@@ -82,6 +82,38 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
 }
 
 #[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_deregisterTable(
+    env: JNIEnv,
+    _class: JClass,
+    runtime: jlong,
+    pointer: jlong,
+    name: JString,
+    callback: JObject,
+) {
+    let runtime = unsafe { &mut *(runtime as *mut Runtime) };
+    let name: String = env
+        .get_string(name)
+        .expect("Couldn't get name as string!")
+        .into();
+    let context = unsafe { &mut *(pointer as *mut SessionContext) };
+    runtime.block_on(async {
+        let register_result = context
+            .deregister_table(name.as_str());
+        let err_message: JValue = match register_result {
+            Ok(_) => JValue::Void,
+            Err(err) => {
+                let err_message = env
+                    .new_string(err.to_string())
+                    .expect("Couldn't create java string!");
+                err_message.into()
+            }
+        };
+        env.call_method(callback, "accept", "(Ljava/lang/Object;)V", &[err_message])
+            .expect("failed to callback method");
+    });
+}
+
+#[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_querySql(
     env: JNIEnv,
     _class: JClass,
