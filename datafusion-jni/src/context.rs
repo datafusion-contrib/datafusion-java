@@ -22,7 +22,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
         .into();
     let path: String = env
         .get_string(path)
-        .expect("Couldn't get name as string!")
+        .expect("Couldn't get path as string!")
         .into();
     let context = unsafe { &mut *(pointer as *mut SessionContext) };
     runtime.block_on(async {
@@ -124,6 +124,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_qu
         .expect("failed to call method");
     });
 }
+
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_destroySessionContext(
     _env: JNIEnv,

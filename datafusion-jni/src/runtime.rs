@@ -17,6 +17,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_TokioRuntime_createTokio
         -1
     }
 }
+
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_TokioRuntime_destroyTokioRuntime(
     _env: JNIEnv,

@@ -1,5 +1,6 @@
 use arrow::ipc::writer::FileWriter;
 use datafusion::dataframe::DataFrame;
+use datafusion::prelude::SessionContext;
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::jlong;
 use jni::JNIEnv;
@@ -7,7 +8,6 @@ use std::convert::Into;
 use std::io::BufWriter;
 use std::io::Cursor;
 use std::sync::Arc;
-use datafusion::prelude::SessionContext;
 use tokio::runtime::Runtime;
 
 #[no_mangle]
@@ -41,6 +41,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDatafr
         let ba = env
             .byte_array_from_slice(&buff.get_ref())
             .expect("cannot create empty byte array");
+        let ba = unsafe { jni::objects::JObject::from_raw(ba) };
         env.call_method(
             callback,
             "accept",
