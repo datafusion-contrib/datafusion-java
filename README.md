@@ -1,8 +1,8 @@
 # datafusion-java
 
-[![Build](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/build.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/build.yml)
-[![Release](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml)
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.maven.apache.org%2Fmaven2%2Fio%2Fgithub%2Fdatafusion-contrib%2Fdatafusion-java%2Fmaven-metadata.xml)](https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/)
+[![Build](https://github.com/G-Research/datafusion-java/actions/workflows/build.yml/badge.svg)](https://github.com/G-Research/datafusion-java/actions/workflows/build.yml)
+[![Release](https://github.com/G-Research/datafusion-java/actions/workflows/release.yml/badge.svg)](https://github.com/G-Research/datafusion-java/actions/workflows/release.yml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Fuk%2Fco%2Fgresearch%2Fdatafusion%2Fdatafusion-java%2Fmaven-metadata.xml)](https://repo1.maven.org/maven2/uk/co/gresearch/datafusion/datafusion-java/)
 
 A Java binding to [Apache Arrow DataFusion][1]
 
@@ -19,9 +19,9 @@ The artifacts are [published][2] to maven central, so you can use like any norma
 ```groovy
 dependencies {
     implementation(
-        group = "io.github.datafusion-contrib",
+        group = "uk.co.gresearch.datafusion",
         name = "datafusion-java",
-        version = "0.12.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
+        version = "0.12.0" // or latest version, checkout https://github.com/G-Research/datafusion-java/releases
     )
 }
 ```
@@ -72,7 +72,7 @@ tasks {
 
 dependencies {
   implementation(
-    group = "io.github.datafusion-contrib",
+    group = "uk.co.gresearch.datafusion",
     name = "datafusion-java",
     version = "0.12.0"
   )
@@ -255,4 +255,4 @@ To build the library:
 ```
 
 [1]: https://github.com/apache/arrow-datafusion
-[2]: https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/
+[2]: https://central.sonatype.com/artifact/uk.co.gresearch.datafusion/datafusion-java/

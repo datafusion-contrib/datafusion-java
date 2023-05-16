@@ -122,7 +122,7 @@ publishing {
             pom {
                 name = 'DataFusion Java'
                 description = 'A Java binding to Apache Arrow DataFusion library'
-                url = 'https://github.com/datafusion-contrib/datafusion-java'
+                url = 'https://github.com/G-Research/datafusion-java'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -137,9 +137,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git@github.com:datafusion-contrib/datafusion-java.git'
-                    developerConnection = 'scm:git:https://github.com/datafusion-contrib/datafusion-java.git'
-                    url = 'https://github.com/datafusion-contrib/datafusion-java'
+                    connection = 'scm:git:git@github.com:G-Research/datafusion-java.git'
+                    developerConnection = 'scm:git:https://github.com/G-Research/datafusion-java.git'
+                    url = 'https://github.com/G-Research/datafusion-java'
                 }
             }
         }
@@ -174,10 +174,9 @@ if (jniLibWindows.get().asFile.exists()) {
 
 
 signing {
-    required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
-    def signingKeyId = findProperty("signingKeyId")
+    required { gradle.taskGraph.hasTask("publish") }
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.mavenJava
 }

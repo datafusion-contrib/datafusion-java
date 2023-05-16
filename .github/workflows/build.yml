@@ -105,5 +105,5 @@ jobs:
         with:
           name: datafusion-java
           if-no-files-found: error
-          path: ~/.m2/repository/io/github/datafusion-contrib/datafusion-java
+          path: ~/.m2/repository/uk/co/gresearch/datafusion/datafusion-java
           retention-days: 3
