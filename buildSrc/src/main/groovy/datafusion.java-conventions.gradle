@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'io.github.datafusion-contrib'
+group = 'uk.co.gresearch'
 version = '0.13.0-SNAPSHOT'
 
 repositories {
