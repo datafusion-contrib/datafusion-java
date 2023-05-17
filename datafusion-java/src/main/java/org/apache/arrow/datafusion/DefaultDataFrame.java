@@ -41,6 +41,25 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
     return result;
   }
 
+  @Override
+  public CompletableFuture<RecordBatchStream> executeStream(BufferAllocator allocator) {
+    CompletableFuture<RecordBatchStream> result = new CompletableFuture<>();
+    Runtime runtime = context.getRuntime();
+    long runtimePointer = runtime.getPointer();
+    long dataframe = getPointer();
+    DataFrames.executeStream(
+        runtimePointer,
+        dataframe,
+        (errString, streamId) -> {
+          if (containsError(errString)) {
+            result.completeExceptionally(new RuntimeException(errString));
+          } else {
+            result.complete(new DefaultRecordBatchStream(context, streamId, allocator));
+          }
+        });
+    return result;
+  }
+
   private boolean containsError(String errString) {
     return errString != null && !"".equals(errString);
   }
