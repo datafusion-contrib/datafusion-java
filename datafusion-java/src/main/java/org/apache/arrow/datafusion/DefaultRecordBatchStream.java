@@ -1,15 +1,12 @@
 package org.apache.arrow.datafusion;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
+import org.apache.arrow.c.ArrowArray;
+import org.apache.arrow.c.ArrowSchema;
+import org.apache.arrow.c.Data;
 import org.apache.arrow.memory.BufferAllocator;
-import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
-import org.apache.arrow.vector.ipc.ArrowFileReader;
 import org.apache.arrow.vector.types.pojo.Schema;
-import org.apache.arrow.vector.util.ByteArrayReadableSeekableByteChannel;
-import org.apache.arrow.vector.util.TransferPair;
 
 class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStream {
   private final SessionContext context;
@@ -47,30 +44,17 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
     next(
         runtimePointer,
         recordBatchStream,
-        (String errString, byte[] arr) -> {
+        (errString, arrowArrayAddress) -> {
           if (containsError(errString)) {
             result.completeExceptionally(new RuntimeException(errString));
-          } else if (arr.length == 0) {
+          } else if (arrowArrayAddress == 0) {
             // Reached end of stream
             result.complete(false);
           } else {
-            ByteArrayReadableSeekableByteChannel byteChannel =
-                new ByteArrayReadableSeekableByteChannel(arr);
-            try (ArrowFileReader reader = new ArrowFileReader(byteChannel, allocator)) {
-              VectorSchemaRoot batchRoot = reader.getVectorSchemaRoot();
-              if (!reader.loadNextBatch()) {
-                result.completeExceptionally(new RuntimeException("No record batch from reader"));
-              } else {
-                // Transfer data into our VectorSchemaRoot
-                List<FieldVector> vectors = batchRoot.getFieldVectors();
-                for (int i = 0; i < vectors.size(); ++i) {
-                  TransferPair pair =
-                      vectors.get(i).makeTransferPair(vectorSchemaRoot.getVector(i));
-                  pair.transfer();
-                }
-                vectorSchemaRoot.setRowCount(batchRoot.getRowCount());
-                result.complete(true);
-              }
+            try {
+              ArrowArray arrowArray = ArrowArray.wrap(arrowArrayAddress);
+              Data.importIntoVectorSchemaRoot(allocator, arrowArray, vectorSchemaRoot, null);
+              result.complete(true);
             } catch (Exception e) {
               result.completeExceptionally(e);
             }
@@ -93,14 +77,15 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
     CompletableFuture<Schema> result = new CompletableFuture<>();
     getSchema(
         recordBatchStream,
-        (String errString, byte[] arr) -> {
+        (errString, arrowSchemaAddress) -> {
           if (containsError(errString)) {
             result.completeExceptionally(new RuntimeException(errString));
           } else {
-            ByteArrayReadableSeekableByteChannel byteChannel =
-                new ByteArrayReadableSeekableByteChannel(arr);
-            try (ArrowFileReader reader = new ArrowFileReader(byteChannel, allocator)) {
-              result.complete(reader.getVectorSchemaRoot().getSchema());
+            try {
+              ArrowSchema arrowSchema = ArrowSchema.wrap(arrowSchemaAddress);
+              Schema schema = Data.importSchema(allocator, arrowSchema, null);
+              result.complete(schema);
+              // The FFI schema will be released from rust when it is dropped
             } catch (Exception e) {
               result.completeExceptionally(e);
             }
@@ -113,9 +98,9 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
     return errString != null && !"".equals(errString);
   }
 
-  private static native void getSchema(long pointer, BiConsumer<String, byte[]> callback);
+  private static native void getSchema(long pointer, ObjectResultCallback callback);
 
-  private static native void next(long runtime, long pointer, BiConsumer<String, byte[]> callback);
+  private static native void next(long runtime, long pointer, ObjectResultCallback callback);
 
   private static native void destroy(long pointer);
 }
