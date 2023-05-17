@@ -1,5 +1,6 @@
 use arrow::ipc::writer::FileWriter;
 use datafusion::dataframe::DataFrame;
+use datafusion::prelude::SessionContext;
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::jlong;
 use jni::JNIEnv;
@@ -7,7 +8,6 @@ use std::convert::Into;
 use std::io::BufWriter;
 use std::io::Cursor;
 use std::sync::Arc;
-use datafusion::prelude::SessionContext;
 use tokio::runtime::Runtime;
 
 #[no_mangle]
