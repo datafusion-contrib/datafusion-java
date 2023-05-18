@@ -41,8 +41,8 @@ import org.apache.arrow.datafusion.SessionContexts;
 public class DataFusionDemo {
 
     public static void main(String[] args) throws Exception {
-        try (ExecutionContext executionContext = ExecutionContexts.create()) {
-            executionContext.sql("select sqrt(65536)").thenCompose(DataFrame::show).join();
+        try (SessionContext sessionContext = SessionContexts.create()) {
+            sessionContext.sql("select sqrt(65536)").thenCompose(DataFrame::show).join();
         }
     }
 }
@@ -220,32 +220,46 @@ Run the example in one line:
 Or roll your own test example:
 
 ```java
-// public class ExampleMain {
-public static void main(String[] args) throws Exception {
-  try (ExecutionContext context = ExecutionContexts.create();
-      BufferAllocator allocator = new RootAllocator()) {
-    DataFrame dataFrame = context.sql("select 1.5 + sqrt(2.0)");
-    dataFrame.collect(allocator).thenAccept(ExampleMain::onReaderResult);
-  }
-}
+import org.apache.arrow.datafusion.DataFrame;
+import org.apache.arrow.datafusion.SessionContext;
+import org.apache.arrow.datafusion.SessionContexts;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.Float8Vector;
+import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.ipc.ArrowReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-private void onReaderResult(ArrowReader reader) {
-  try {
-    VectorSchemaRoot root = reader.getVectorSchemaRoot();
-    Schema schema = root.getSchema();
-    while (reader.loadNextBatch()) {
-      Float8Vector vector = (Float8Vector) root.getVector(0);
-      for (int i = 0; i < root.getRowCount(); i += 1) {
-        logger.info("value {}={}", i, vector.getValueAsDouble(i));
-      }
+import java.io.IOException;
+
+public class ExampleMain {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExampleMain.class);
+
+    public static void main(String[] args) throws Exception {
+        try (SessionContext sessionContext = SessionContexts.create(); BufferAllocator allocator = new RootAllocator()) {
+            DataFrame dataFrame = sessionContext.sql("select 1.5 + sqrt(2.0)").get();
+            dataFrame.collect(allocator).thenAccept(ExampleMain::onReaderResult).get();
+        }
     }
-    // close to release resource
-    reader.close();
-  } catch (IOException e) {
-    logger.warn("got IO Exception", e);
-  }
+
+    private static void onReaderResult(ArrowReader reader) {
+        try {
+            VectorSchemaRoot root = reader.getVectorSchemaRoot();
+            while (reader.loadNextBatch()) {
+                Float8Vector vector = (Float8Vector) root.getVector(0);
+                for (int i = 0; i < root.getRowCount(); i += 1) {
+                    logger.info("value {}={}", i, vector.getValueAsDouble(i));
+                }
+            }
+            // close to release resource
+            reader.close();
+        } catch (IOException e) {
+            logger.warn("got IO Exception", e);
+        }
+    }
 }
-// } /* end of ExampleMain */
 ```
 
 To build the library:
