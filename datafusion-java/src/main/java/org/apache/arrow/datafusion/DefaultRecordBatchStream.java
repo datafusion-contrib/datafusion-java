@@ -1,16 +1,20 @@
 package org.apache.arrow.datafusion;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
+import org.apache.arrow.c.CDataDictionaryProvider;
 import org.apache.arrow.c.Data;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.dictionary.Dictionary;
 import org.apache.arrow.vector.types.pojo.Schema;
 
 class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStream {
   private final SessionContext context;
   private final BufferAllocator allocator;
+  private final CDataDictionaryProvider dictionaryProvider;
   private VectorSchemaRoot vectorSchemaRoot = null;
   private boolean initialized = false;
 
@@ -18,11 +22,13 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
     super(pointer);
     this.context = context;
     this.allocator = allocator;
+    this.dictionaryProvider = new CDataDictionaryProvider();
   }
 
   @Override
   void doClose(long pointer) {
     destroy(pointer);
+    dictionaryProvider.close();
     if (initialized) {
       vectorSchemaRoot.close();
     }
@@ -53,7 +59,8 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
           } else {
             try {
               ArrowArray arrowArray = ArrowArray.wrap(arrowArrayAddress);
-              Data.importIntoVectorSchemaRoot(allocator, arrowArray, vectorSchemaRoot, null);
+              Data.importIntoVectorSchemaRoot(
+                  allocator, arrowArray, vectorSchemaRoot, dictionaryProvider);
               result.complete(true);
             } catch (Exception e) {
               result.completeExceptionally(e);
@@ -61,6 +68,16 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
           }
         });
     return result;
+  }
+
+  @Override
+  public Dictionary lookup(long id) {
+    return dictionaryProvider.lookup(id);
+  }
+
+  @Override
+  public Set<Long> getDictionaryIds() {
+    return dictionaryProvider.getDictionaryIds();
   }
 
   private void ensureInitialized() {
@@ -83,7 +100,7 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
           } else {
             try {
               ArrowSchema arrowSchema = ArrowSchema.wrap(arrowSchemaAddress);
-              Schema schema = Data.importSchema(allocator, arrowSchema, null);
+              Schema schema = Data.importSchema(allocator, arrowSchema, dictionaryProvider);
               result.complete(schema);
               // The FFI schema will be released from rust when it is dropped
             } catch (Exception e) {

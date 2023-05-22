@@ -2,11 +2,12 @@ package org.apache.arrow.datafusion;
 
 import java.util.concurrent.CompletableFuture;
 import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.dictionary.DictionaryProvider;
 
 /**
  * A record batch stream is a stream of tabular Arrow data that can be iterated over asynchronously
  */
-public interface RecordBatchStream extends AutoCloseable, NativeProxy {
+public interface RecordBatchStream extends AutoCloseable, NativeProxy, DictionaryProvider {
   /**
    * Get the VectorSchemaRoot that will be populated with data as the stream is iterated over
    *
