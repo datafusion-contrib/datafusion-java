@@ -2,6 +2,7 @@ package org.apache.arrow.datafusion;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,12 +10,16 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.BigIntVector;
+import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.ipc.ArrowFileWriter;
 import org.apache.arrow.vector.ipc.ArrowReader;
+import org.apache.arrow.vector.types.pojo.Field;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -59,6 +64,55 @@ public class TestListingTable {
       try (ParquetFormat format = new ParquetFormat();
           ListingOptions listingOptions =
               ListingOptions.builder(format).withFileExtension(".parquet").build();
+          ListingTableConfig tableConfig =
+              ListingTableConfig.builder(dataDir)
+                  .withListingOptions(listingOptions)
+                  .build(context)
+                  .join();
+          ListingTable listingTable = new ListingTable(tableConfig)) {
+        context.registerTable("test", listingTable);
+        testQuery(context, allocator);
+      }
+    }
+  }
+
+  @Test
+  public void testArrowListingTable(@TempDir Path tempDir) throws Exception {
+    try (SessionContext context = SessionContexts.create();
+        BufferAllocator allocator = new RootAllocator()) {
+      Path dataDir = tempDir.resolve("data");
+      Files.createDirectories(dataDir);
+
+      Path arrowFilePath0 = dataDir.resolve("0.arrow");
+      Path arrowFilePath1 = dataDir.resolve("1.arrow");
+
+      // Write data files in Arrow IPC (Feather V2) file format
+      try (BigIntVector xVector = new BigIntVector("x", allocator);
+          BigIntVector yVector = new BigIntVector("y", allocator)) {
+        List<FieldVector> vectors = Arrays.asList(xVector, yVector);
+
+        for (int i = 0; i < 2; i++) {
+          xVector.setSafe(i, i * 2 + 1);
+          yVector.setSafe(i, i * 2 + 2);
+        }
+        xVector.setValueCount(2);
+        yVector.setValueCount(2);
+        writeArrowFile(arrowFilePath0, vectors);
+
+        xVector.reset();
+        yVector.reset();
+        for (int i = 0; i < 2; i++) {
+          xVector.setSafe(i, i * 2 + 1);
+          yVector.setSafe(i, i * 2 + 12);
+        }
+        xVector.setValueCount(2);
+        yVector.setValueCount(2);
+        writeArrowFile(arrowFilePath1, vectors);
+      }
+
+      try (ArrowFormat format = new ArrowFormat();
+          ListingOptions listingOptions =
+              ListingOptions.builder(format).withFileExtension(".arrow").build();
           ListingTableConfig tableConfig =
               ListingTableConfig.builder(dataDir)
                   .withListingOptions(listingOptions)
@@ -148,6 +202,17 @@ public class TestListingTable {
           record.put("y", i * 2 + 12);
         });
     return new Path[] {parquetFilePath0, parquetFilePath1};
+  }
+
+  private static void writeArrowFile(Path filePath, List<FieldVector> vectors) throws Exception {
+    List<Field> fields = vectors.stream().map(v -> v.getField()).collect(Collectors.toList());
+    try (VectorSchemaRoot root = new VectorSchemaRoot(fields, vectors);
+        FileOutputStream output = new FileOutputStream(filePath.toString());
+        ArrowFileWriter writer = new ArrowFileWriter(root, null, output.getChannel())) {
+      writer.start();
+      writer.writeBatch();
+      writer.end();
+    }
   }
 
   private static void testQuery(SessionContext context, BufferAllocator allocator)

@@ -4,6 +4,8 @@ class FileFormats {
 
   private FileFormats() {}
 
+  static native long createArrow();
+
   static native long createCsv();
 
   static native long createParquet();
