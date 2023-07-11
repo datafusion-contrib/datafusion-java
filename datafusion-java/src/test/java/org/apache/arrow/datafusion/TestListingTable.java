@@ -11,14 +11,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.arrow.compression.CommonsCompressionFactory;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.BigIntVector;
 import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.compression.CompressionCodec;
+import org.apache.arrow.vector.compression.CompressionUtil;
+import org.apache.arrow.vector.compression.NoCompressionCodec;
 import org.apache.arrow.vector.ipc.ArrowFileWriter;
 import org.apache.arrow.vector.ipc.ArrowReader;
+import org.apache.arrow.vector.ipc.message.IpcOption;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -97,7 +102,7 @@ public class TestListingTable {
         }
         xVector.setValueCount(2);
         yVector.setValueCount(2);
-        writeArrowFile(arrowFilePath0, vectors);
+        writeArrowFile(arrowFilePath0, vectors, false);
 
         xVector.reset();
         yVector.reset();
@@ -107,7 +112,7 @@ public class TestListingTable {
         }
         xVector.setValueCount(2);
         yVector.setValueCount(2);
-        writeArrowFile(arrowFilePath1, vectors);
+        writeArrowFile(arrowFilePath1, vectors, false);
       }
 
       try (ArrowFormat format = new ArrowFormat();
@@ -121,6 +126,57 @@ public class TestListingTable {
           ListingTable listingTable = new ListingTable(tableConfig)) {
         context.registerTable("test", listingTable);
         testQuery(context, allocator);
+      }
+    }
+  }
+
+  @Test
+  public void testCompressedArrowIpc(@TempDir Path tempDir) throws Exception {
+    try (SessionContext context = SessionContexts.create();
+        BufferAllocator allocator = new RootAllocator()) {
+      Path dataDir = tempDir.resolve("data");
+      Files.createDirectories(dataDir);
+      Path arrowFilePath0 = dataDir.resolve("0.arrow");
+
+      // Data needs to be reasonably large otherwise compression is not used
+      int numRows = 10_000;
+
+      // Write data files in compressed Arrow IPC (Feather V2) file format
+      try (BigIntVector xVector = new BigIntVector("x", allocator)) {
+        for (int i = 0; i < numRows; i++) {
+          xVector.setSafe(i, i * 2 + 1);
+        }
+        xVector.setValueCount(numRows);
+        List<FieldVector> vectors = Arrays.asList(xVector);
+        writeArrowFile(arrowFilePath0, vectors, true);
+      }
+
+      try (ArrowFormat format = new ArrowFormat();
+          ListingOptions listingOptions =
+              ListingOptions.builder(format).withFileExtension(".arrow").build();
+          ListingTableConfig tableConfig =
+              ListingTableConfig.builder(dataDir)
+                  .withListingOptions(listingOptions)
+                  .build(context)
+                  .join();
+          ListingTable listingTable = new ListingTable(tableConfig)) {
+        context.registerTable("test", listingTable);
+        try (ArrowReader reader =
+            context
+                .sql("SELECT x FROM test")
+                .thenComposeAsync(df -> df.collect(allocator))
+                .join()) {
+
+          int globalRow = 0;
+          VectorSchemaRoot root = reader.getVectorSchemaRoot();
+          while (reader.loadNextBatch()) {
+            BigIntVector xValues = (BigIntVector) root.getVector(0);
+            for (int row = 0; row < root.getRowCount(); ++row, ++globalRow) {
+              assertEquals(globalRow * 2 + 1, xValues.get(row));
+            }
+          }
+          assertEquals(numRows, globalRow);
+        }
       }
     }
   }
@@ -204,11 +260,24 @@ public class TestListingTable {
     return new Path[] {parquetFilePath0, parquetFilePath1};
   }
 
-  private static void writeArrowFile(Path filePath, List<FieldVector> vectors) throws Exception {
+  private static void writeArrowFile(Path filePath, List<FieldVector> vectors, boolean compressed)
+      throws Exception {
     List<Field> fields = vectors.stream().map(v -> v.getField()).collect(Collectors.toList());
+    CompressionUtil.CodecType codec =
+        compressed ? CompressionUtil.CodecType.ZSTD : CompressionUtil.CodecType.NO_COMPRESSION;
+    CompressionCodec.Factory compressionFactory =
+        compressed ? new CommonsCompressionFactory() : NoCompressionCodec.Factory.INSTANCE;
     try (VectorSchemaRoot root = new VectorSchemaRoot(fields, vectors);
         FileOutputStream output = new FileOutputStream(filePath.toString());
-        ArrowFileWriter writer = new ArrowFileWriter(root, null, output.getChannel())) {
+        ArrowFileWriter writer =
+            new ArrowFileWriter(
+                root,
+                null,
+                output.getChannel(),
+                null,
+                IpcOption.DEFAULT,
+                compressionFactory,
+                codec)) {
       writer.start();
       writer.writeBatch();
       writer.end();
