@@ -1,2 +1,8 @@
+// https://docs.gradle.org/current/userguide/toolchains.html#sub:download_repositories
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.4.0'
+}
+
 rootProject.name = 'datafusion-java'
+
 include 'datafusion-java', 'datafusion-examples'

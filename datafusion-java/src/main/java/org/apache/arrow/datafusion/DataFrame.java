@@ -46,6 +46,7 @@ public interface DataFrame extends NativeProxy {
 
   /**
    * Register this dataframe as a temporary table.
+   *
    * @param context SessionContext to register table to
    * @param name name of the tmp table
    * @return null
