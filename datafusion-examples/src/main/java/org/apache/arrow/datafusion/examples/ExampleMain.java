@@ -55,16 +55,7 @@ public class ExampleMain {
 
       context
           .sql("select * from test_parquet limit 3")
-          .thenAccept(
-              df -> {
-                try {
-                  boolean previouslyRegistered =
-                      context.registerTable("test_parquet_limited", df.intoView()).isPresent();
-                  assert !previouslyRegistered;
-                } catch (Exception e) {
-                  throw new RuntimeException(e);
-                }
-              })
+          .thenComposeAsync(df -> df.registerTable(context, "test_parquet_limited"))
           .join();
 
       context.sql("select * from test_parquet_limited").thenComposeAsync(DataFrame::show).join();

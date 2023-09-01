@@ -20,5 +20,6 @@ final class DataFrames {
 
   static native void writeCsv(long runtime, long dataframe, String path, Consumer<String> callback);
 
-  static native long intoView(long dataframe);
+  static native void registerTable(
+      long runtime, long dataframe, long context, String name, Consumer<String> callback);
 }

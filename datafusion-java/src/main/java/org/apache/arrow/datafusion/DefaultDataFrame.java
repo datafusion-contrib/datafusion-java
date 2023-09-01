@@ -104,11 +104,25 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
     return future;
   }
 
-  @Override
-  public TableProvider intoView() {
+  public CompletableFuture<Void> registerTable(SessionContext ctx, String name) {
+    Runtime runtime = context.getRuntime();
+    long runtimePointer = runtime.getPointer();
     long dataframe = getPointer();
-    long tableProviderPointer = DataFrames.intoView(dataframe);
-    return new DefaultTableProvider(tableProviderPointer);
+    long contextPointer = ctx.getPointer();
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    DataFrames.registerTable(
+        runtimePointer,
+        dataframe,
+        contextPointer,
+        name,
+        (String errString) -> {
+          if (containsError(errString)) {
+            future.completeExceptionally(new RuntimeException(errString));
+          } else {
+            future.complete(null);
+          }
+        });
+    return future;
   }
 
   @Override

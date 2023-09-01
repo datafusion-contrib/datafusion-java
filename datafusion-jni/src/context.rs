@@ -1,10 +1,8 @@
-use datafusion::datasource::TableProvider;
 use datafusion::execution::context::SessionContext;
 use datafusion::prelude::{CsvReadOptions, ParquetReadOptions};
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::jlong;
 use jni::JNIEnv;
-use std::sync::Arc;
 use tokio::runtime::Runtime;
 
 #[no_mangle]
@@ -46,32 +44,6 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
         )
         .expect("failed to callback method");
     });
-}
-
-#[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_registerTable(
-    mut env: JNIEnv,
-    _class: JClass,
-    pointer: jlong,
-    name: JString,
-    table_provider: jlong,
-) -> jlong {
-    let name: String = env
-        .get_string(&name)
-        .expect("Couldn't get name as string!")
-        .into();
-    let context = unsafe { &mut *(pointer as *mut SessionContext) };
-    let table_provider = unsafe { &*(table_provider as *const Arc<dyn TableProvider>) };
-    let result = context.register_table(&name, table_provider.clone());
-    match result {
-        Ok(Some(v)) => Box::into_raw(Box::new(v)) as jlong,
-        Ok(None) => 0,
-        Err(err) => {
-            env.throw_new("java/lang/Exception", err.to_string())
-                .unwrap();
-            0
-        }
-    }
 }
 
 #[no_mangle]
