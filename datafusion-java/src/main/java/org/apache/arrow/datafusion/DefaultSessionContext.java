@@ -28,7 +28,7 @@ class DefaultSessionContext extends AbstractProxy implements SessionContext {
         getPointer(),
         sql,
         (errMessage, dataframeId) -> {
-          if (null != errMessage && !errMessage.equals("")) {
+          if (null != errMessage && !errMessage.isEmpty()) {
             future.completeExceptionally(new RuntimeException(errMessage));
           } else {
             DefaultDataFrame frame = new DefaultDataFrame(DefaultSessionContext.this, dataframeId);
@@ -65,7 +65,7 @@ class DefaultSessionContext extends AbstractProxy implements SessionContext {
   }
 
   private void voidCallback(CompletableFuture<Void> future, String errMessage) {
-    if (null != errMessage && !errMessage.equals("")) {
+    if (null != errMessage && !errMessage.isEmpty()) {
       future.completeExceptionally(new RuntimeException(errMessage));
     } else {
       future.complete(null);

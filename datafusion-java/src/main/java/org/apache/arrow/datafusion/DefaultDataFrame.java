@@ -61,7 +61,7 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
   }
 
   private boolean containsError(String errString) {
-    return errString != null && !"".equals(errString);
+    return errString != null && !errString.isEmpty();
   }
 
   @Override
