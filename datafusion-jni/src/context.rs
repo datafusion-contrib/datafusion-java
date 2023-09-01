@@ -1,6 +1,6 @@
 use datafusion::execution::context::SessionContext;
 use datafusion::prelude::{CsvReadOptions, ParquetReadOptions};
-use jni::objects::{JClass, JObject, JString, JValue};
+use jni::objects::{JClass, JObject, JString};
 use jni::sys::jlong;
 use jni::JNIEnv;
 use tokio::runtime::Runtime;
@@ -106,12 +106,15 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_qu
         let query_result = context.sql(&sql).await;
         match query_result {
             Ok(v) => {
+                let empty_str = env
+                    .new_string("".to_string())
+                    .expect("Couldn't create java string!");
                 let dataframe = Box::into_raw(Box::new(v)) as jlong;
                 env.call_method(
                     callback,
                     "callback",
                     "(Ljava/lang/String;J)V",
-                    &[JValue::Void, dataframe.into()],
+                    &[(&empty_str).into(), dataframe.into()],
                 )
             }
             Err(err) => {
