@@ -6,5 +6,10 @@ package org.apache.arrow.datafusion;
  */
 interface NativeProxy {
 
+  /**
+   * Get a pointer to the native object
+   *
+   * @return Pointer value as a long
+   */
   long getPointer();
 }
