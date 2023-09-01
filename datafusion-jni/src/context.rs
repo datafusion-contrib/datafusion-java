@@ -6,24 +6,22 @@ use jni::JNIEnv;
 use tokio::runtime::Runtime;
 
 #[no_mangle]
-pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_registerCsv<
-    'local,
->(
-    mut env: JNIEnv<'local>,
-    _class: &JClass<'local>,
+pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_registerCsv(
+    mut env: JNIEnv,
+    _class: JClass,
     runtime: jlong,
     pointer: jlong,
-    name: &JString<'local>,
-    path: &JString<'local>,
-    callback: &JObject<'local>,
+    name: JString,
+    path: JString,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let name: String = env
-        .get_string(name)
+        .get_string(&name)
         .expect("Couldn't get name as string!")
         .into();
     let path: String = env
-        .get_string(path)
+        .get_string(&path)
         .expect("Couldn't get name as string!")
         .into();
     let context = unsafe { &mut *(pointer as *mut SessionContext) };
@@ -51,20 +49,20 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_registerParquet(
     mut env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     runtime: jlong,
     pointer: jlong,
-    name: &JString,
-    path: &JString,
-    callback: &JObject,
+    name: JString,
+    path: JString,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let name: String = env
-        .get_string(name)
+        .get_string(&name)
         .expect("Couldn't get name as string!")
         .into();
     let path: String = env
-        .get_string(path)
+        .get_string(&path)
         .expect("Couldn't get path as string!")
         .into();
     let context = unsafe { &mut *(pointer as *mut SessionContext) };
@@ -92,15 +90,15 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_querySql(
     mut env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     runtime: jlong,
     pointer: jlong,
-    sql: &JString,
-    callback: &JObject,
+    sql: JString,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let sql: String = env
-        .get_string(sql)
+        .get_string(&sql)
         .expect("Couldn't get sql as string!")
         .into();
     let context = unsafe { &mut *(pointer as *mut SessionContext) };
@@ -135,7 +133,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_qu
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_destroySessionContext(
     _env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     pointer: jlong,
 ) {
     let _ = unsafe { Box::from_raw(pointer as *mut SessionContext) };
@@ -144,7 +142,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_destroyS
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_createSessionContext(
     _env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
 ) -> jlong {
     let context = SessionContext::new();
     Box::into_raw(Box::new(context)) as jlong

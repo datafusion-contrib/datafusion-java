@@ -13,10 +13,10 @@ use tokio::runtime::Runtime;
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDataframe(
     mut env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     runtime: jlong,
     dataframe: jlong,
-    callback: &JObject,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
@@ -54,10 +54,10 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDatafr
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe(
     mut env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     runtime: jlong,
     dataframe: jlong,
-    callback: &JObject,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
@@ -83,16 +83,16 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeParquet(
     mut env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     runtime: jlong,
     dataframe: jlong,
-    path: &JString,
-    callback: &JObject,
+    path: JString,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
     let path: String = env
-        .get_string(path)
+        .get_string(&path)
         .expect("Couldn't get path as string!")
         .into();
     runtime.block_on(async {
@@ -117,16 +117,16 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeParquet(
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeCsv(
     mut env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     runtime: jlong,
     dataframe: jlong,
-    path: &JString,
-    callback: &JObject,
+    path: JString,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
     let path: String = env
-        .get_string(path)
+        .get_string(&path)
         .expect("Couldn't get path as string!")
         .into();
     runtime.block_on(async {
@@ -151,18 +151,18 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeCsv(
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_registerTable(
     mut env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     runtime: jlong,
     dataframe: jlong,
     session: jlong,
-    name: &JString,
-    callback: &JObject,
+    name: JString,
+    callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
     let dataframe = unsafe { &mut *(dataframe as *mut Arc<DataFrame>) };
     let context = unsafe { &mut *(session as *mut SessionContext) };
     let name: String = env
-        .get_string(name)
+        .get_string(&name)
         .expect("Couldn't get name as string!")
         .into();
     runtime.block_on(async {
@@ -187,7 +187,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_registerTable
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_destroyDataFrame(
     _env: JNIEnv,
-    _class: &JClass,
+    _class: JClass,
     pointer: jlong,
 ) {
     let _ = unsafe { Box::from_raw(pointer as *mut Arc<DataFrame>) };
