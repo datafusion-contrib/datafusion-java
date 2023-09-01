@@ -30,7 +30,7 @@ java {
     withSourcesJar()
 
     compileJava {
-        options.compilerArgs += ["-h", "${buildDir}/target/headers"]
+        options.compilerArgs += ["-h", "${layout.buildDirectory.asFile.get()}/target/headers"]
     }
 }
 

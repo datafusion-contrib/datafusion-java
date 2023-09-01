@@ -45,11 +45,8 @@ public interface DataFrame extends NativeProxy {
   CompletableFuture<Void> writeCsv(Path path);
 
   /**
-   * Register this dataframe as a temporary table.
-   *
-   * @param context SessionContext to register table to
-   * @param name name of the tmp table
-   * @return null
+   * Converts this DataFrame into a TableProvider that can be registered as a table view using
+   * {@link SessionContext#registerParquet(String, Path)}
    */
-  CompletableFuture<Void> registerTable(SessionContext context, String name);
+  TableProvider intoView();
 }

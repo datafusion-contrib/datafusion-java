@@ -12,8 +12,8 @@ edition = "2021"
 [dependencies]
 jni = "^0.21.0"
 tokio = "^1.32.0"
-arrow = "^22.0"
-datafusion = "^12.0"
+arrow = "^36.0"
+datafusion = "^22.0"
 
 [lib]
 crate_type = ["cdylib"]
