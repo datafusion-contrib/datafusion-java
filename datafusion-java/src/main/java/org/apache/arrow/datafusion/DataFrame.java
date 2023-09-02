@@ -47,6 +47,9 @@ public interface DataFrame extends NativeProxy {
   /**
    * Converts this DataFrame into a TableProvider that can be registered as a table view using
    * {@link SessionContext#registerParquet(String, Path)}
+   *
+   * @return the table provider ready to be e.g. {@link SessionContext#registerTable(String,
+   *     TableProvider) registered}.
    */
   TableProvider intoView();
 }
