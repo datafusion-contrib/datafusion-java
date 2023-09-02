@@ -12,7 +12,7 @@ use tokio::runtime::Runtime;
 
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream_next(
-    env: mut JNIEnv,
+    mut env: JNIEnv,
     _class: JClass,
     runtime: jlong,
     stream: jlong,
@@ -66,7 +66,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
 
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream_getSchema(
-    env: mut JNIEnv,
+    mut env: JNIEnv,
     _class: JClass,
     stream: jlong,
     callback: JObject,
