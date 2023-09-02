@@ -2,6 +2,7 @@ package org.apache.arrow.datafusion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
@@ -27,6 +28,10 @@ public class TestQuery {
           context.registerTable("test", df.intoView()).isPresent(),
           "there should not be any duplicates");
       testQuery(context, allocator);
+      assertThrows(
+          Exception.class,
+          () -> context.registerTable("test", df.intoView()),
+          "now there should be duplicates");
     }
   }
 

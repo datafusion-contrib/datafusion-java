@@ -39,8 +39,8 @@ public interface SessionContext extends AutoCloseable, NativeProxy {
    *
    * @param name table reference
    * @param tableProvider table provider
-   * @return the TableProvider previously registered for this reference, if any
-   * @throws Exception when exception happened
+   * @return as of Arrow 22 this is only {@link Optional#empty()}
+   * @throws Exception when the table is already registered
    */
   Optional<TableProvider> registerTable(String name, TableProvider tableProvider) throws Exception;
 

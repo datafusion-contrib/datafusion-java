@@ -64,6 +64,8 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
     let table_provider = unsafe { &*(table_provider as *const Arc<dyn TableProvider>) };
     let result = context.register_table(&name, table_provider.clone());
     match result {
+        // TODO this is to be fixed on datafusion side as duplicates will not be returned
+        // and instead returned as err
         Ok(Some(v)) => Box::into_raw(Box::new(v)) as jlong,
         Ok(None) => 0,
         Err(err) => {
