@@ -1,6 +1,5 @@
 use arrow::ipc::writer::FileWriter;
 use datafusion::dataframe::DataFrame;
-use datafusion::error::DataFusionError;
 use jni::objects::{JClass, JObject, JString};
 use jni::sys::jlong;
 use jni::JNIEnv;
@@ -60,7 +59,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe
     callback: JObject,
 ) {
     let runtime = unsafe { &mut *(runtime as *mut Runtime) };
-    let dataframe = unsafe { & *(dataframe as *const DataFrame) };
+    let dataframe = unsafe { &*(dataframe as *const DataFrame) };
     runtime.block_on(async {
         let r = dataframe.clone().show().await;
         let err_message = match r {
@@ -130,7 +129,11 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeCsv(
         .expect("Couldn't get path as string!")
         .into();
     runtime.block_on(async {
-        dataframe.clone().write_csv(&path).await;
+        dataframe
+            .clone()
+            .write_csv(&path)
+            .await
+            .expect("failed to write csv");
         let err_message = env
             .new_string("".to_string())
             .expect("Couldn't create java string!");
