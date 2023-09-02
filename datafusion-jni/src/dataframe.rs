@@ -80,6 +80,17 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe
 }
 
 #[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_intoView(
+    _env: JNIEnv,
+    _class: JClass,
+    dataframe: jlong,
+) -> jlong {
+    let dataframe = unsafe { &*(dataframe as *const DataFrame) };
+    let provider = dataframe.clone().into_view();
+    Box::into_raw(Box::new(provider)) as jlong
+}
+
+#[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeParquet(
     mut env: JNIEnv,
     _class: JClass,
