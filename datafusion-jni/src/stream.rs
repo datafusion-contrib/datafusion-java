@@ -66,7 +66,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
 
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream_getSchema(
-    env: JNIEnv,
+    env: mut JNIEnv,
     _class: JClass,
     stream: jlong,
     callback: JObject,
