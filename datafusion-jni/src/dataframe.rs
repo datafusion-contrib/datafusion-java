@@ -53,7 +53,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDatafr
 
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_executeStream(
-    env: JNIEnv,
+    env: mut JNIEnv,
     _class: JClass,
     runtime: jlong,
     dataframe: jlong,
