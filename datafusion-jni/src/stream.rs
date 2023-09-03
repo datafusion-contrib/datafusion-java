@@ -3,7 +3,7 @@ use arrow::array::StructArray;
 use arrow::ffi::{FFI_ArrowArray, FFI_ArrowSchema};
 use datafusion::physical_plan::SendableRecordBatchStream;
 use futures::stream::TryStreamExt;
-use jni::objects::{JClass, JObject, JValue};
+use jni::objects::{JClass, JObject};
 use jni::sys::jlong;
 use jni::JNIEnv;
 use std::convert::Into;
@@ -34,7 +34,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
                     callback,
                     "callback",
                     "(Ljava/lang/String;J)V",
-                    &[err_message.into(), array_address.into()],
+                    &[(&err_message).into(), array_address.into()],
                 )
             }
             Ok(None) => {
@@ -44,7 +44,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
                     callback,
                     "callback",
                     "(Ljava/lang/String;J)V",
-                    &[err_message.into(), array_address.into()],
+                    &[(&err_message).into(), array_address.into()],
                 )
             }
             Err(err) => {
@@ -56,7 +56,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
                     callback,
                     "callback",
                     "(Ljava/lang/String;J)V",
-                    &[err_message.into(), array_address.into()],
+                    &[(&err_message).into(), array_address.into()],
                 )
             }
         }
@@ -77,11 +77,12 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
     match ffi_schema {
         Ok(mut ffi_schema) => {
             let schema_address = addr_of_mut!(ffi_schema) as jlong;
+            let err_message = env.new_string("").expect("Couldn't create java string!");
             env.call_method(
                 callback,
                 "callback",
                 "(Ljava/lang/String;J)V",
-                &[JValue::Void, schema_address.into()],
+                &[(&err_message).into(), schema_address.into()],
             )
         }
         Err(err) => {
@@ -93,7 +94,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
                 callback,
                 "callback",
                 "(Ljava/lang/String;J)V",
-                &[err_message.into(), schema_address.into()],
+                &[(&err_message).into(), schema_address.into()],
             )
         }
     }
