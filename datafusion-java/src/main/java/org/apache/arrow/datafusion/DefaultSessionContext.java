@@ -1,6 +1,7 @@
 package org.apache.arrow.datafusion;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ class DefaultSessionContext extends AbstractProxy implements SessionContext {
 
   static native void registerParquet(
       long runtime, long context, String name, String path, Consumer<String> callback);
+
+  static native long registerTable(long context, String name, long tableProvider) throws Exception;
 
   @Override
   public CompletableFuture<DataFrame> sql(String sql) {
@@ -62,6 +65,16 @@ class DefaultSessionContext extends AbstractProxy implements SessionContext {
         path.toAbsolutePath().toString(),
         (errMessage) -> voidCallback(future, errMessage));
     return future;
+  }
+
+  @Override
+  public Optional<TableProvider> registerTable(String name, TableProvider tableProvider)
+      throws Exception {
+    long previouslyRegistered = registerTable(getPointer(), name, tableProvider.getPointer());
+    if (previouslyRegistered == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(new DefaultTableProvider(previouslyRegistered));
   }
 
   private void voidCallback(CompletableFuture<Void> future, String errMessage) {

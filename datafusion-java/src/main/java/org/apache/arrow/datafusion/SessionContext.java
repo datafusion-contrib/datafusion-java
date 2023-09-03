@@ -1,6 +1,7 @@
 package org.apache.arrow.datafusion;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /** A session context holds resources and is the entrance for obtaining {@link DataFrame} */
@@ -31,6 +32,17 @@ public interface SessionContext extends AutoCloseable, NativeProxy {
    * @return Future that is completed when the Parquet file is registered
    */
   CompletableFuture<Void> registerParquet(String name, Path path);
+
+  /**
+   * Registers a TableProvider as a table that can be referenced from SQL statements executed
+   * against this context.
+   *
+   * @param name table reference
+   * @param tableProvider table provider
+   * @return as of Arrow 22 this is only {@link Optional#empty()}
+   * @throws Exception when the table is already registered
+   */
+  Optional<TableProvider> registerTable(String name, TableProvider tableProvider) throws Exception;
 
   /**
    * Get the runtime associated with this context
