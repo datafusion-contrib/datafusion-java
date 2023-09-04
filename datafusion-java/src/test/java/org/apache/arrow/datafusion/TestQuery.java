@@ -78,6 +78,16 @@ public class TestQuery {
     }
   }
 
+  @Test
+  public void testInvalidQuery() throws Exception {
+    try (SessionContext context = SessionContexts.create()) {
+      assertThrows(
+          RuntimeException.class,
+          () -> context.sql("SELECT z FROM (VALUES (1, 2), (3, 4)) AS t (x, y)").join(),
+          "invalid column name in query should raise an error");
+    }
+  }
+
   private static void testQuery(SessionContext context, BufferAllocator allocator)
       throws Exception {
     try (ArrowReader reader =
