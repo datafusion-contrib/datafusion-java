@@ -15,7 +15,7 @@ java {
     }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     // down-compile to minimal version
     options.release.set(8)
 }
