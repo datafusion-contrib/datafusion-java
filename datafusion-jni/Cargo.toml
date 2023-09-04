@@ -12,8 +12,9 @@ edition = "2021"
 [dependencies]
 jni = "^0.21.0"
 tokio = "^1.32.0"
-arrow = "^36.0"
+arrow = { version = "^36.0", features = ["ffi"] }
 datafusion = "^22.0"
+futures = "0.3.28"
 
 [lib]
 crate_type = ["cdylib"]

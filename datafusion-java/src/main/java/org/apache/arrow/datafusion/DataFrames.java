@@ -15,6 +15,8 @@ final class DataFrames {
   static native void collectDataframe(
       long runtime, long dataframe, BiConsumer<String, byte[]> callback);
 
+  static native void executeStream(long runtime, long dataframe, ObjectResultCallback callback);
+
   static native void writeParquet(
       long runtime, long dataframe, String path, Consumer<String> callback);
 

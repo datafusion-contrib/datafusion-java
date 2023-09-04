@@ -22,6 +22,14 @@ public interface DataFrame extends NativeProxy {
   CompletableFuture<ArrowReader> collect(BufferAllocator allocator);
 
   /**
+   * Execute this DataFrame and return a stream of the result data
+   *
+   * @param allocator {@link BufferAllocator buffer allocator} to allocate vectors for the stream
+   * @return Stream of results
+   */
+  CompletableFuture<RecordBatchStream> executeStream(BufferAllocator allocator);
+
+  /**
    * Print results.
    *
    * @return null

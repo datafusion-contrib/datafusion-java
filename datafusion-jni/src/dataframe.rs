@@ -51,6 +51,48 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDatafr
 }
 
 #[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_executeStream(
+    mut env: JNIEnv,
+    _class: JClass,
+    runtime: jlong,
+    dataframe: jlong,
+    callback: JObject,
+) {
+    let runtime = unsafe { &mut *(runtime as *mut Runtime) };
+    let dataframe = unsafe { &mut *(dataframe as *mut DataFrame) };
+    runtime.block_on(async {
+        let stream_result = dataframe.clone().execute_stream().await;
+        match stream_result {
+            Ok(stream) => {
+                let stream = Box::into_raw(Box::new(stream)) as jlong;
+                let err_message = env
+                    .new_string("".to_string())
+                    .expect("Couldn't create java string!");
+                env.call_method(
+                    callback,
+                    "callback",
+                    "(Ljava/lang/String;J)V",
+                    &[(&err_message).into(), stream.into()],
+                )
+            }
+            Err(err) => {
+                let stream = -1 as jlong;
+                let err_message = env
+                    .new_string(err.to_string())
+                    .expect("Couldn't create java string!");
+                env.call_method(
+                    callback,
+                    "callback",
+                    "(Ljava/lang/String;J)V",
+                    &[(&err_message).into(), stream.into()],
+                )
+            }
+        }
+        .expect("failed to call method");
+    });
+}
+
+#[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe(
     mut env: JNIEnv,
     _class: JClass,
