@@ -7,6 +7,8 @@ use jni::JNIEnv;
 use std::sync::Arc;
 use tokio::runtime::Runtime;
 
+use crate::util::{set_error_message, set_object_result};
+
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_registerCsv(
     mut env: JNIEnv,
@@ -31,20 +33,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
         let register_result = context
             .register_csv(&name, &path, CsvReadOptions::new())
             .await;
-        let err_message = match register_result {
-            Ok(_) => "".to_string(),
-            Err(err) => err.to_string(),
-        };
-        let err_message = env
-            .new_string(err_message)
-            .expect("Couldn't create java string!");
-        env.call_method(
-            callback,
-            "accept",
-            "(Ljava/lang/Object;)V",
-            &[(&err_message).into()],
-        )
-        .expect("failed to callback method");
+        set_error_message(&mut env, callback, register_result);
     });
 }
 
@@ -100,20 +89,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_re
         let register_result = context
             .register_parquet(&name, &path, ParquetReadOptions::default())
             .await;
-        let err_message = match register_result {
-            Ok(_) => "".to_string(),
-            Err(err) => err.to_string(),
-        };
-        let err_message = env
-            .new_string(err_message)
-            .expect("Couldn't create java string!");
-        env.call_method(
-            callback,
-            "accept",
-            "(Ljava/lang/Object;)V",
-            &[(&err_message).into()],
-        )
-        .expect("failed to callback method");
+        set_error_message(&mut env, callback, register_result);
     });
 }
 
@@ -134,33 +110,11 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultSessionContext_qu
     let context = unsafe { &mut *(pointer as *mut SessionContext) };
     runtime.block_on(async {
         let query_result = context.sql(&sql).await;
-        match query_result {
-            Ok(v) => {
-                let empty_str = env
-                    .new_string("".to_string())
-                    .expect("Couldn't create java string!");
-                let dataframe = Box::into_raw(Box::new(v)) as jlong;
-                env.call_method(
-                    callback,
-                    "callback",
-                    "(Ljava/lang/String;J)V",
-                    &[(&empty_str).into(), dataframe.into()],
-                )
-            }
-            Err(err) => {
-                let err_message = env
-                    .new_string(err.to_string())
-                    .expect("Couldn't create java string!");
-                let dataframe = -1 as jlong;
-                env.call_method(
-                    callback,
-                    "callback",
-                    "(Ljava/lang/String;J)V",
-                    &[(&err_message).into(), dataframe.into()],
-                )
-            }
-        }
-        .expect("failed to call method");
+        set_object_result(
+            &mut env,
+            callback,
+            query_result.map(|df| Box::into_raw(Box::new(df))),
+        );
     });
 }
 #[no_mangle]
