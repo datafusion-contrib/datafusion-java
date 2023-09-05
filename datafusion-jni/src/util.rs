@@ -15,7 +15,7 @@ pub fn set_error_message<Err: Error>(env: &mut JNIEnv, callback: JObject, result
                 "(Ljava/lang/Object;)V",
                 &[(&err_message).into()],
             )
-            .expect("Failed to call error handler with null");
+            .expect("Failed to call error handler with null message");
         }
         Err(err) => {
             let err_message = env
@@ -27,7 +27,7 @@ pub fn set_error_message<Err: Error>(env: &mut JNIEnv, callback: JObject, result
                 "(Ljava/lang/Object;)V",
                 &[(&err_message).into()],
             )
-            .expect("Failed to call error handler with null");
+            .expect("Failed to call error handler with error message");
         }
     };
 }
