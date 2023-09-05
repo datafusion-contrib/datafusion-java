@@ -8,6 +8,8 @@ use std::io::BufWriter;
 use std::io::Cursor;
 use tokio::runtime::Runtime;
 
+use crate::util::{set_error_message, set_object_result};
+
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_collectDataframe(
     mut env: JNIEnv,
@@ -62,33 +64,11 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_executeStream
     let dataframe = unsafe { &mut *(dataframe as *mut DataFrame) };
     runtime.block_on(async {
         let stream_result = dataframe.clone().execute_stream().await;
-        match stream_result {
-            Ok(stream) => {
-                let stream = Box::into_raw(Box::new(stream)) as jlong;
-                let err_message = env
-                    .new_string("".to_string())
-                    .expect("Couldn't create java string!");
-                env.call_method(
-                    callback,
-                    "callback",
-                    "(Ljava/lang/String;J)V",
-                    &[(&err_message).into(), stream.into()],
-                )
-            }
-            Err(err) => {
-                let stream = -1 as jlong;
-                let err_message = env
-                    .new_string(err.to_string())
-                    .expect("Couldn't create java string!");
-                env.call_method(
-                    callback,
-                    "callback",
-                    "(Ljava/lang/String;J)V",
-                    &[(&err_message).into(), stream.into()],
-                )
-            }
-        }
-        .expect("failed to call method");
+        set_object_result(
+            &mut env,
+            callback,
+            stream_result.map(|stream| Box::into_raw(Box::new(stream))),
+        );
     });
 }
 
@@ -104,20 +84,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_showDataframe
     let dataframe = unsafe { &*(dataframe as *const DataFrame) };
     runtime.block_on(async {
         let r = dataframe.clone().show().await;
-        let err_message = match r {
-            Ok(_) => "".to_string(),
-            Err(err) => err.to_string(),
-        };
-        let err_message = env
-            .new_string(err_message)
-            .expect("Couldn't create java string!");
-        env.call_method(
-            callback,
-            "accept",
-            "(Ljava/lang/Object;)V",
-            &[(&err_message).into()],
-        )
-        .expect("failed to call method");
+        set_error_message(&mut env, callback, r);
     });
 }
 
@@ -149,20 +116,7 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeParquet(
         .into();
     runtime.block_on(async {
         let r = dataframe.clone().write_parquet(&path, None).await;
-        let err_message = match r {
-            Ok(_) => "".to_string(),
-            Err(err) => err.to_string(),
-        };
-        let err_message = env
-            .new_string(err_message)
-            .expect("Couldn't create java string!");
-        env.call_method(
-            callback,
-            "accept",
-            "(Ljava/lang/Object;)V",
-            &[(&err_message).into()],
-        )
-        .expect("failed to call method");
+        set_error_message(&mut env, callback, r);
     });
 }
 
@@ -182,21 +136,8 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DataFrames_writeCsv(
         .expect("Couldn't get path as string!")
         .into();
     runtime.block_on(async {
-        dataframe
-            .clone()
-            .write_csv(&path)
-            .await
-            .expect("failed to write csv");
-        let err_message = env
-            .new_string("".to_string())
-            .expect("Couldn't create java string!");
-        env.call_method(
-            callback,
-            "accept",
-            "(Ljava/lang/Object;)V",
-            &[(&err_message).into()],
-        )
-        .expect("failed to call method");
+        let r = dataframe.clone().write_csv(&path).await;
+        set_error_message(&mut env, callback, r);
     });
 }
 

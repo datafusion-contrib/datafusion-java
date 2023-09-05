@@ -10,6 +10,8 @@ use std::convert::Into;
 use std::ptr::addr_of_mut;
 use tokio::runtime::Runtime;
 
+use crate::util::{set_object_result_error, set_object_result_ok};
+
 #[no_mangle]
 pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream_next(
     mut env: JNIEnv,
@@ -28,39 +30,16 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
                 let struct_array: StructArray = batch.into();
                 let array_data = struct_array.into_data();
                 let mut ffi_array = FFI_ArrowArray::new(&array_data);
-                let err_message = env.new_string("").expect("Couldn't create java string!");
-                let array_address = addr_of_mut!(ffi_array) as jlong;
-                env.call_method(
-                    callback,
-                    "callback",
-                    "(Ljava/lang/String;J)V",
-                    &[(&err_message).into(), array_address.into()],
-                )
+                // ffi_array must remain alive until after the callback is called
+                set_object_result_ok(&mut env, callback, addr_of_mut!(ffi_array));
             }
             Ok(None) => {
-                let err_message = env.new_string("").expect("Couldn't create java string!");
-                let array_address = 0 as jlong;
-                env.call_method(
-                    callback,
-                    "callback",
-                    "(Ljava/lang/String;J)V",
-                    &[(&err_message).into(), array_address.into()],
-                )
+                set_object_result_ok(&mut env, callback, 0 as *mut FFI_ArrowSchema);
             }
             Err(err) => {
-                let err_message = env
-                    .new_string(err.to_string())
-                    .expect("Couldn't create java string!");
-                let array_address = -1 as jlong;
-                env.call_method(
-                    callback,
-                    "callback",
-                    "(Ljava/lang/String;J)V",
-                    &[(&err_message).into(), array_address.into()],
-                )
+                set_object_result_error(&mut env, callback, &err);
             }
         }
-        .expect("failed to call method");
     });
 }
 
@@ -76,29 +55,13 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_DefaultRecordBatchStream
     let ffi_schema = FFI_ArrowSchema::try_from(&*schema);
     match ffi_schema {
         Ok(mut ffi_schema) => {
-            let schema_address = addr_of_mut!(ffi_schema) as jlong;
-            let err_message = env.new_string("").expect("Couldn't create java string!");
-            env.call_method(
-                callback,
-                "callback",
-                "(Ljava/lang/String;J)V",
-                &[(&err_message).into(), schema_address.into()],
-            )
+            // ffi_schema must remain alive until after the callback is called
+            set_object_result_ok(&mut env, callback, addr_of_mut!(ffi_schema));
         }
         Err(err) => {
-            let err_message = env
-                .new_string(err.to_string())
-                .expect("Couldn't create java string!");
-            let schema_address = -1 as jlong;
-            env.call_method(
-                callback,
-                "callback",
-                "(Ljava/lang/String;J)V",
-                &[(&err_message).into(), schema_address.into()],
-            )
+            set_object_result_error(&mut env, callback, &err);
         }
     }
-    .expect("failed to call method");
 }
 
 #[no_mangle]
