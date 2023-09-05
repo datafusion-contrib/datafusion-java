@@ -51,7 +51,7 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
         runtimePointer,
         recordBatchStream,
         (errString, arrowArrayAddress) -> {
-          if (containsError(errString)) {
+          if (ErrorUtil.containsError(errString)) {
             result.completeExceptionally(new RuntimeException(errString));
           } else if (arrowArrayAddress == 0) {
             // Reached end of stream
@@ -95,7 +95,7 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
     getSchema(
         recordBatchStream,
         (errString, arrowSchemaAddress) -> {
-          if (containsError(errString)) {
+          if (ErrorUtil.containsError(errString)) {
             result.completeExceptionally(new RuntimeException(errString));
           } else {
             try {
@@ -109,10 +109,6 @@ class DefaultRecordBatchStream extends AbstractProxy implements RecordBatchStrea
           }
         });
     return result.join();
-  }
-
-  private static boolean containsError(String errString) {
-    return errString != null && !"".equals(errString);
   }
 
   private static native void getSchema(long pointer, ObjectResultCallback callback);
