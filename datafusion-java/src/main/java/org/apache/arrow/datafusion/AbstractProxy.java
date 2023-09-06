@@ -21,6 +21,11 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
     this.children = new ConcurrentHashMap<>();
   }
 
+  /**
+   * Register a child proxy object that should be closed when this object is closed
+   *
+   * @param child the child proxy to register
+   */
   protected final void registerChild(AbstractProxy child) {
     AbstractProxy old = children.putIfAbsent(child.getPointer(), child);
     if (old != null) {
@@ -28,6 +33,9 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
     }
   }
 
+  /**
+   * @return Whether the object has been closed
+   */
   protected final boolean isClosed() {
     return closed.get();
   }
