@@ -1,3 +1,4 @@
+use datafusion::datasource::file_format::arrow::ArrowFormat;
 use datafusion::datasource::file_format::csv::CsvFormat;
 use datafusion::datasource::file_format::parquet::ParquetFormat;
 use datafusion::datasource::file_format::FileFormat;
@@ -25,6 +26,15 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_FileFormats_createParque
     // Return as an Arc<dyn FileFormat> rather than ParquetFormat so this
     // can be passed into ListingOptions.create
     let format: Arc<dyn FileFormat> = Arc::new(ParquetFormat::default());
+    Box::into_raw(Box::new(format)) as jlong
+}
+
+#[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_FileFormats_createArrow(
+    _env: JNIEnv,
+    _class: JClass,
+) -> jlong {
+    let format: Arc<dyn FileFormat> = Arc::new(ArrowFormat::default());
     Box::into_raw(Box::new(format)) as jlong
 }
 
