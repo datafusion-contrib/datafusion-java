@@ -49,7 +49,7 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
 
   // Ensure native library is loaded before any proxy object is used
   static {
-   JNILoader.load();
+    JNILoader.load();
   }
 
   @Override
