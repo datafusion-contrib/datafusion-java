@@ -12,8 +12,8 @@ edition = "2021"
 [dependencies]
 jni = "^0.21.0"
 tokio = "^1.32.0"
-arrow = { version = "^36.0", features = ["ffi"] }
-datafusion = "^22.0"
+arrow = { version = "^39.0", features = ["ffi"] }
+datafusion = "^25.0"
 futures = "0.3.28"
 
 [lib]
