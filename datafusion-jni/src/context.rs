@@ -1,6 +1,6 @@
 use datafusion::datasource::TableProvider;
 use datafusion::execution::context::SessionContext;
-use datafusion::prelude::{CsvReadOptions, ParquetReadOptions};
+use datafusion::prelude::{CsvReadOptions, ParquetReadOptions, SessionConfig};
 use jni::objects::{JClass, JObject, JString};
 use jni::sys::jlong;
 use jni::JNIEnv;
@@ -132,5 +132,16 @@ pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_createSe
     _class: JClass,
 ) -> jlong {
     let context = SessionContext::new();
+    Box::into_raw(Box::new(context)) as jlong
+}
+
+#[no_mangle]
+pub extern "system" fn Java_org_apache_arrow_datafusion_SessionContexts_createSessionContextWithConfig(
+    _env: JNIEnv,
+    _class: JClass,
+    config: jlong,
+) -> jlong {
+    let config = unsafe { &*(config as *const SessionConfig) };
+    let context = SessionContext::with_config(config.clone());
     Box::into_raw(Box::new(context)) as jlong
 }

@@ -47,6 +47,11 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
 
   abstract void doClose(long pointer) throws Exception;
 
+  // Ensure native library is loaded before any proxy object is used
+  static {
+    JNILoader.load();
+  }
+
   @Override
   public final void close() throws Exception {
     if (closed.compareAndSet(false, true)) {

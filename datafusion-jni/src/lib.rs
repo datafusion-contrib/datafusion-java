@@ -5,6 +5,7 @@ mod listing_options;
 mod listing_table;
 mod listing_table_config;
 mod runtime;
+mod session_config;
 mod stream;
 mod table_provider;
 mod util;
