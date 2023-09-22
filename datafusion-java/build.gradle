@@ -16,7 +16,7 @@ dependencies {
     testImplementation 'org.apache.arrow:arrow-compression:13.0.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testImplementation 'org.apache.hadoop:hadoop-client:3.3.5'
-    testImplementation 'org.apache.hadoop:hadoop-common:3.3.5'
+    testImplementation 'org.apache.hadoop:hadoop-common:3.3.6'
     testImplementation 'org.apache.parquet:parquet-avro:1.13.0'
     testImplementation 'org.apache.parquet:parquet-hadoop:1.13.0'
 }
