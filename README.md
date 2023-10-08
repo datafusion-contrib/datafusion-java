@@ -9,8 +9,8 @@ A Java binding to [Apache Arrow DataFusion][1]
 ## Status
 
 This project is still work in progress, and currently it works with Arrow 9.0 and DataFusion 7.0 version.
-It is build and verified in CI against Java 11 and 17. You may check out the docker run instructions
-where Java 17 `jshell` is used to run interactively.
+It is build and verified in CI against Java 11 and 21. You may check out the docker run instructions
+where Java 21 `jshell` is used to run interactively.
 
 ## How to use in your code
 
