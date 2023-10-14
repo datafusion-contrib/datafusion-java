@@ -48,6 +48,7 @@ final class JNILoader {
     }
     return prefix + libraryName + "." + getExtension();
   }
+
   /**
    * @return the absolute path in the jar file for the jni library
    */
