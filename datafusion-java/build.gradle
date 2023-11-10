@@ -12,7 +12,7 @@ dependencies {
     api 'org.apache.arrow:arrow-format:13.0.0'
     api 'org.apache.arrow:arrow-vector:14.0.0'
     implementation 'org.apache.arrow:arrow-c-data:13.0.0'
-    runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:13.0.0'
+    runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:14.0.0'
     testImplementation 'org.apache.arrow:arrow-compression:13.0.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.apache.hadoop:hadoop-client:3.3.6'
