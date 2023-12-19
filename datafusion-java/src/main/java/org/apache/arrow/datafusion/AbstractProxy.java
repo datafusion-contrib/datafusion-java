@@ -34,7 +34,8 @@ abstract class AbstractProxy implements AutoCloseable, NativeProxy {
   }
 
   /**
-   * @return Whether the object has been closed
+   * Whether the object has been closed
+   * @return boolean value of closeness.
    */
   protected final boolean isClosed() {
     return closed.get();
