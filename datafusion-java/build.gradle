@@ -11,7 +11,7 @@ dependencies {
     api 'org.slf4j:slf4j-api:2.0.9'
     api 'org.apache.arrow:arrow-format:14.0.1'
     api 'org.apache.arrow:arrow-vector:13.0.0'
-    implementation 'org.apache.arrow:arrow-c-data:13.0.0'
+    implementation 'org.apache.arrow:arrow-c-data:14.0.1'
     runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:14.0.0'
     testImplementation 'org.apache.arrow:arrow-compression:14.0.1'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
