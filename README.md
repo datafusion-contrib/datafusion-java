@@ -8,20 +8,20 @@ A Java binding to [Apache Arrow DataFusion][1]
 
 ## Status
 
-This project is still work in progress, and currently it works with Arrow 9.0 and DataFusion 7.0 version.
-It is build and verified in CI against Java 11 and 21. You may check out the docker run instructions
+This project is still a work in progress, and it currently works with Arrow 14.0 and DataFusion version 25.0.
+It is built and verified in CI against Java 11 and 21. You may check out the [docker run instructions](#how-to-run-the-interactive-demo)
 where Java 21 `jshell` is used to run interactively.
 
 ## How to use in your code
 
-The artifacts are [published][2] to maven central, so you can use like any normal Java libraries:
+The artifacts are [published][2] to maven central, so you can use datafusion-java like any normal Java library:
 
 ```groovy
 dependencies {
     implementation(
         group = "io.github.datafusion-contrib",
         name = "datafusion-java",
-        version = "0.12.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
+        version = "0.16.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
     )
 }
 ```
@@ -74,7 +74,7 @@ dependencies {
   implementation(
     group = "io.github.datafusion-contrib",
     name = "datafusion-java",
-    version = "0.12.0"
+    version = "0.16.0"
   )
 }
 
@@ -86,7 +86,6 @@ dependencies {
 <summary>Run result</summary>
 
 ```
-
 $ ./gradlew run
 ...
 > Task :compileKotlin UP-TO-DATE
@@ -106,8 +105,6 @@ successfully shutdown tokio runtime
 BUILD SUCCESSFUL in 2s
 3 actionable tasks: 1 executed, 2 up-to-date
 16:43:34: Execution finished 'run'.
-
-
 ```
 
 </details>
@@ -209,7 +206,7 @@ v ==> [0.6838531634528577]
 
 ### 2. Build from source
 
-Note you must have local Rust and Java environment setup.
+Note you must have a local Rust and Java environment setup.
 
 Run the example in one line:
 
