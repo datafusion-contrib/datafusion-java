@@ -14,7 +14,7 @@ dependencies {
     implementation project(':datafusion-java')
     implementation 'org.slf4j:slf4j-api:2.0.9'
     implementation 'ch.qos.logback:logback-classic:1.5.0'
-    implementation 'org.apache.arrow:arrow-format:14.0.1'
+    implementation 'org.apache.arrow:arrow-format:15.0.0'
     implementation 'org.apache.arrow:arrow-vector:13.0.0'
 }
 
