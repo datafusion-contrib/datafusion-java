@@ -1,6 +1,8 @@
-build/
-target/
-out/
-bin/
-.idea/
-.gradle/
+Dockerfile
+README.md
+**/build/
+**/target/
+**/out/
+**/bin/
+**/.idea/
+**/.gradle/
