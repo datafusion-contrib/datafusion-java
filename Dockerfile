@@ -1,10 +1,8 @@
-FROM openjdk:21-jdk-slim-bullseye
+FROM amazoncorretto:21
 
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get update && \
-  apt-get -y install curl gcc && \
-  rm -rf /var/lib/apt/lists/*
+RUN yum install -y gcc && \
+    yum clean all && \
+    rm -rf /var/cache/yum
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
