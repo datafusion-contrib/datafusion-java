@@ -250,5 +250,5 @@ To build the library:
 ./gradlew build
 ```
 
-[1]: https://github.com/apache/arrow-datafusion
+[1]: https://github.com/apache/datafusion
 [2]: https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/
