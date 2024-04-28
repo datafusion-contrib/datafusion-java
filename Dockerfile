@@ -1,10 +1,8 @@
-FROM openjdk:11-jdk-slim-bullseye
+FROM amazoncorretto:21
 
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get update && \
-  apt-get -y install curl gcc && \
-  rm -rf /var/lib/apt/lists/*
+RUN yum install -y gcc && \
+    yum clean all && \
+    rm -rf /var/cache/yum
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
@@ -22,4 +20,11 @@ COPY . .
 
 RUN ./gradlew copyDevLibrary installDist
 
-CMD ["./datafusion-examples/build/install/datafusion-examples/bin/datafusion-examples"]
+# Set working directory so that the relative paths to resource files used in ExampleMain are correct
+WORKDIR /usr/opt/datafusion-java/datafusion-examples
+
+# Configure environment variables to allow loading datafusion-java in jshell
+ENV CLASSPATH="/usr/opt/datafusion-java/datafusion-examples/build/install/datafusion-examples/lib/*"
+ENV JDK_JAVA_OPTIONS="-Djava.library.path=/usr/opt/datafusion-java/datafusion-java/build/jni_libs/dev --add-opens=java.base/java.nio=ALL-UNNAMED"
+
+CMD ["./build/install/datafusion-examples/bin/datafusion-examples"]
