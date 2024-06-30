@@ -114,20 +114,20 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
     DataFrames.destroyDataFrame(pointer);
   }
 
-    private static class RuntimeExceptionCallback implements Consumer<String> {
-        private final CompletableFuture<?> future;
+  private static class RuntimeExceptionCallback implements Consumer<String> {
+    private final CompletableFuture<?> future;
 
-        private RuntimeExceptionCallback(CompletableFuture<?> future) {
-            this.future = future;
-        }
-
-        @Override
-        public void accept(String errString) {
-            if (ErrorUtil.containsError(errString)) {
-                future.completeExceptionally(new RuntimeException(errString));
-            } else {
-                future.complete(null);
-            }
-        }
+    private RuntimeExceptionCallback(CompletableFuture<?> future) {
+      this.future = future;
     }
+
+    @Override
+    public void accept(String errString) {
+      if (ErrorUtil.containsError(errString)) {
+        future.completeExceptionally(new RuntimeException(errString));
+      } else {
+        future.complete(null);
+      }
+    }
+  }
 }
