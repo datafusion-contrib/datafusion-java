@@ -2,6 +2,7 @@ package org.apache.arrow.datafusion;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.ipc.ArrowFileReader;
 import org.apache.arrow.vector.ipc.ArrowReader;
@@ -69,13 +70,7 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
     DataFrames.showDataframe(
         runtimePointer,
         dataframe,
-        (String errString) -> {
-          if (ErrorUtil.containsError(errString)) {
-            future.completeExceptionally(new RuntimeException(errString));
-          } else {
-            future.complete(null);
-          }
-        });
+        new RuntimeExceptionCallback(future));
     return future;
   }
 
@@ -89,13 +84,7 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
         runtimePointer,
         dataframe,
         path.toAbsolutePath().toString(),
-        (String errString) -> {
-          if (ErrorUtil.containsError(errString)) {
-            future.completeExceptionally(new RuntimeException(errString));
-          } else {
-            future.complete(null);
-          }
-        });
+        new RuntimeExceptionCallback(future));
     return future;
   }
 
@@ -109,13 +98,7 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
         runtimePointer,
         dataframe,
         path.toAbsolutePath().toString(),
-        (String errString) -> {
-          if (ErrorUtil.containsError(errString)) {
-            future.completeExceptionally(new RuntimeException(errString));
-          } else {
-            future.complete(null);
-          }
-        });
+        new RuntimeExceptionCallback(future));
     return future;
   }
 
@@ -130,4 +113,21 @@ class DefaultDataFrame extends AbstractProxy implements DataFrame {
   void doClose(long pointer) {
     DataFrames.destroyDataFrame(pointer);
   }
+
+    private static class RuntimeExceptionCallback implements Consumer<String> {
+        private final CompletableFuture<?> future;
+
+        private RuntimeExceptionCallback(CompletableFuture<?> future) {
+            this.future = future;
+        }
+
+        @Override
+        public void accept(String errString) {
+            if (ErrorUtil.containsError(errString)) {
+                future.completeExceptionally(new RuntimeException(errString));
+            } else {
+                future.complete(null);
+            }
+        }
+    }
 }
