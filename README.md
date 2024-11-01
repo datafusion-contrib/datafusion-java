@@ -8,20 +8,20 @@ A Java binding to [Apache Arrow DataFusion][1]
 
 ## Status
 
-This project is still work in progress, and currently it works with Arrow 9.0 and DataFusion 7.0 version.
-It is build and verified in CI against Java 11 and 21. You may check out the docker run instructions
+This project is still a work in progress, and it currently works with Arrow 14.0 and DataFusion version 25.0.
+It is built and verified in CI against Java 11 and 21. You may check out the [docker run instructions](#how-to-run-the-interactive-demo)
 where Java 21 `jshell` is used to run interactively.
 
 ## How to use in your code
 
-The artifacts are [published][2] to maven central, so you can use like any normal Java libraries:
+The artifacts are [published][2] to maven central, so you can use datafusion-java like any normal Java library:
 
 ```groovy
 dependencies {
     implementation(
         group = "io.github.datafusion-contrib",
         name = "datafusion-java",
-        version = "0.12.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
+        version = "0.16.0" // or latest version, checkout https://github.com/datafusion-contrib/datafusion-java/releases
     )
 }
 ```
@@ -41,8 +41,8 @@ import org.apache.arrow.datafusion.SessionContexts;
 public class DataFusionDemo {
 
     public static void main(String[] args) throws Exception {
-        try (ExecutionContext executionContext = ExecutionContexts.create()) {
-            executionContext.sql("select sqrt(65536)").thenCompose(DataFrame::show).join();
+        try (SessionContext sessionContext = SessionContexts.create()) {
+            sessionContext.sql("select sqrt(65536)").thenCompose(DataFrame::show).join();
         }
     }
 }
@@ -74,7 +74,7 @@ dependencies {
   implementation(
     group = "io.github.datafusion-contrib",
     name = "datafusion-java",
-    version = "0.12.0"
+    version = "0.16.0"
   )
 }
 
@@ -86,7 +86,6 @@ dependencies {
 <summary>Run result</summary>
 
 ```
-
 $ ./gradlew run
 ...
 > Task :compileKotlin UP-TO-DATE
@@ -106,8 +105,6 @@ successfully shutdown tokio runtime
 BUILD SUCCESSFUL in 2s
 3 actionable tasks: 1 executed, 2 up-to-date
 16:43:34: Execution finished 'run'.
-
-
 ```
 
 </details>
@@ -118,87 +115,72 @@ BUILD SUCCESSFUL in 2s
 
 First build the docker image:
 
-<details>
-<summary>docker build -t datafusion-example .</summary>
-
-```text
-❯ docker build -t datafusion-example .
-[+] Building 615.2s (14/14) FINISHED
- => [internal] load build definition from Dockerfile                                                     0.0s
- => => transferring dockerfile: 598B                                                                     0.0s
- => [internal] load .dockerignore                                                                        0.0s
- => => transferring context: 81B                                                                         0.0s
- => [internal] load metadata for docker.io/library/openjdk:11-jdk-slim-bullseye                          5.6s
- => [internal] load build context                                                                       66.5s
- => => transferring context: 4.01GB                                                                     66.0s
- => [1/9] FROM docker.io/library/openjdk:11-jdk-slim-bullseye@sha256:0aac7dafc37d192d744228a6b26437438  22.3s
- => => resolve docker.io/library/openjdk:11-jdk-slim-bullseye@sha256:0aac7dafc37d192d744228a6b264374389  0.0s
- => => sha256:0aac7dafc37d192d744228a6b26437438908929883fc156b761ab779819e0fbd 549B / 549B               0.0s
- => => sha256:452daa20005a0f380b34b3d71a89e06cd7007086945fe3434d2a30fc1002475c 1.16kB / 1.16kB           0.0s
- => => sha256:7c8c5acc99dd425bd4b9cc46edc6f8b1fc7abd23cd5ea4c83d622d8ae1f2230f 5.60kB / 5.60kB           0.0s
- => => sha256:214ca5fb90323fe769c63a12af092f2572bf1c6b300263e09883909fc865d260 31.38MB / 31.38MB         2.6s
-  1 update dockerfile, fix library path
- => => sha256:ebf31789c5c1a5e3676cbd7a34472d61217c52c819552f5b116565c22cb6d2f1 1.58MB / 1.58MB           2.3s
- => => sha256:8741521b2ba4d4d676c7a992cb54627c0eb9fdce1b4f68ad17da4f8b2abf103a 211B / 211B               2.5s
- => => sha256:2b079b63f250d1049457d0657541b735a1915d4c4a5aa6686d172c3821e3ebc9 204.24MB / 204.24MB      16.3s
- => => extracting sha256:214ca5fb90323fe769c63a12af092f2572bf1c6b300263e09883909fc865d260                2.7s
- => => extracting sha256:ebf31789c5c1a5e3676cbd7a34472d61217c52c819552f5b116565c22cb6d2f1                0.3s
- => => extracting sha256:8741521b2ba4d4d676c7a992cb54627c0eb9fdce1b4f68ad17da4f8b2abf103a                0.0s
- => => extracting sha256:2b079b63f250d1049457d0657541b735a1915d4c4a5aa6686d172c3821e3ebc9                5.9s
- => [2/9] RUN apt-get update &&   apt-get -y install curl gcc &&   rm -rf /var/lib/apt/lists/*          23.6s
- => [3/9] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y                   29.6s
- => [4/9] WORKDIR /usr/opt/datafusion-java                                                               0.0s
- => [5/9] COPY build.gradle settings.gradle gradlew ./                                                   0.0s
- => [6/9] COPY gradle gradle                                                                             0.0s
- => [7/9] RUN ./gradlew --version                                                                        8.5s
- => [8/9] COPY . .                                                                                       8.9s
- => [9/9] RUN ./gradlew cargoReleaseBuild build installDist                                            494.7s
- => exporting to image                                                                                  21.9s
- => => exporting layers                                                                                 21.9s
- => => writing image sha256:36cabc4e6c400adb4fa0b10f9c07c79aa9b50703bc76a5727d3e43f85cc76f36             0.0s
- => => naming to docker.io/library/datafusion-example                                                    0.0s
-
-Use '                                                                  0.0s
+```
+docker build -t datafusion-example .
 ```
 
-</details>
+Then you can run the example program using Docker:
 
-Then run using Docker:
+```
+docker run --rm -it datafusion-example
+```
+
+Or start an interactive jshell session:
+
+```
+docker run --rm -it datafusion-example jshell
+```
 
 <details>
-<summary>docker run --rm -it datafusion-example</summary>
+<summary>Example jshell session</summary>
 
 ```text
-Dec 27, 2021 2:52:22 AM java.util.prefs.FileSystemPreferences$1 run
+Jan 11, 2024 1:49:28 AM java.util.prefs.FileSystemPreferences$1 run
 INFO: Created user preferences directory.
-|  Welcome to JShell -- Version 11.0.13
+|  Welcome to JShell -- Version 21
 |  For an introduction type: /help intro
 
 jshell> import org.apache.arrow.datafusion.*
 
-jshell> var context = ExecutionContexts.create()
-context ==> org.apache.arrow.datafusion.DefaultSessionContext@4229bb3f
+jshell> var context = SessionContexts.create()
+01:41:05.586 [main] DEBUG org.apache.arrow.datafusion.JNILoader -- successfully loaded datafusion_jni from library path
+01:41:05.589 [main] DEBUG org.apache.arrow.datafusion.JNILoader -- datafusion_jni already loaded, returning
+01:41:05.590 [main] DEBUG org.apache.arrow.datafusion.AbstractProxy -- Obtaining DefaultSessionContext@7f58383b8db0
+01:41:05.591 [main] DEBUG org.apache.arrow.datafusion.AbstractProxy -- Obtaining TokioRuntime@7f58383ce110
+context ==> org.apache.arrow.datafusion.DefaultSessionContext@2d209079
 
 jshell> var df = context.sql("select 1.1 + cos(2.0)").join()
-df ==> org.apache.arrow.datafusion.DefaultDataFrame@1a18644
+01:41:10.961 [main] DEBUG org.apache.arrow.datafusion.AbstractProxy -- Obtaining DefaultDataFrame@7f5838209100
+df ==> org.apache.arrow.datafusion.DefaultDataFrame@34ce8af7
 
 jshell> import org.apache.arrow.memory.*
 
 jshell> var allocator = new RootAllocator()
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+01:41:22.521 [main] INFO org.apache.arrow.memory.BaseAllocator -- Debug mode disabled. Enable with the VM option -Darrow.memory.debug.allocator=true.
+01:41:22.525 [main] INFO org.apache.arrow.memory.DefaultAllocationManagerOption -- allocation manager type not specified, using netty as the default type
+01:41:22.525 [main] INFO org.apache.arrow.memory.CheckAllocator -- Using DefaultAllocationManager at memory-unsafe-14.0.2.jar!/org/apache/arrow/memory/DefaultAllocationManagerFactory.class
+01:41:22.531 [main] DEBUG org.apache.arrow.memory.util.MemoryUtil -- Constructor for direct buffer found and made accessible
+01:41:22.536 [main] DEBUG org.apache.arrow.memory.util.MemoryUtil -- direct buffer constructor: available
+01:41:22.537 [main] DEBUG org.apache.arrow.memory.rounding.DefaultRoundingPolicy -- -Dorg.apache.memory.allocator.pageSize: 8192
+01:41:22.537 [main] DEBUG org.apache.arrow.memory.rounding.DefaultRoundingPolicy -- -Dorg.apache.memory.allocator.maxOrder: 11
 allocator ==> Allocator(ROOT) 0/0/0/9223372036854775807 (res/actual/peak/limit)
 
 
 jshell> var r = df.collect(allocator).join()
-02:52:46.882 [main] INFO  org.apache.arrow.datafusion.DefaultDataFrame - successfully completed with arr length=538
-r ==> org.apache.arrow.vector.ipc.ArrowFileReader@5167f57d
+01:41:29.635 [main] INFO org.apache.arrow.datafusion.DefaultDataFrame -- successfully completed with arr length=610
+r ==> org.apache.arrow.vector.ipc.ArrowFileReader@7ac7a4e4
 
 jshell> var root = r.getVectorSchemaRoot()
-root ==> org.apache.arrow.vector.VectorSchemaRoot@4264b240
+01:41:34.658 [main] DEBUG org.apache.arrow.vector.ipc.ReadChannel -- Reading buffer with size: 10
+01:41:34.661 [main] DEBUG org.apache.arrow.vector.ipc.ArrowFileReader -- Footer starts at 416, length: 184
+01:41:34.661 [main] DEBUG org.apache.arrow.vector.ipc.ReadChannel -- Reading buffer with size: 184
+root ==> org.apache.arrow.vector.VectorSchemaRoot@6cd28fa7
 
 jshell> r.loadNextBatch()
+01:41:39.421 [main] DEBUG org.apache.arrow.vector.ipc.ArrowFileReader -- RecordBatch at 200, metadata: 192, body: 16
+01:41:39.423 [main] DEBUG org.apache.arrow.vector.ipc.ReadChannel -- Reading buffer with size: 208
+01:41:39.424 [main] DEBUG org.apache.arrow.vector.ipc.message.ArrowRecordBatch -- Buffer in RecordBatch at 0, length: 1
+01:41:39.425 [main] DEBUG org.apache.arrow.vector.ipc.message.ArrowRecordBatch -- Buffer in RecordBatch at 8, length: 8
 $8 ==> true
 
 jshell> var v = root.getVector(0)
@@ -209,7 +191,7 @@ v ==> [0.6838531634528577]
 
 ### 2. Build from source
 
-Note you must have local Rust and Java environment setup.
+Note you must have a local Rust and Java environment setup.
 
 Run the example in one line:
 
@@ -220,32 +202,46 @@ Run the example in one line:
 Or roll your own test example:
 
 ```java
-// public class ExampleMain {
-public static void main(String[] args) throws Exception {
-  try (ExecutionContext context = ExecutionContexts.create();
-      BufferAllocator allocator = new RootAllocator()) {
-    DataFrame dataFrame = context.sql("select 1.5 + sqrt(2.0)");
-    dataFrame.collect(allocator).thenAccept(ExampleMain::onReaderResult);
-  }
-}
+import org.apache.arrow.datafusion.DataFrame;
+import org.apache.arrow.datafusion.SessionContext;
+import org.apache.arrow.datafusion.SessionContexts;
+import org.apache.arrow.memory.BufferAllocator;
+import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.Float8Vector;
+import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.ipc.ArrowReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-private void onReaderResult(ArrowReader reader) {
-  try {
-    VectorSchemaRoot root = reader.getVectorSchemaRoot();
-    Schema schema = root.getSchema();
-    while (reader.loadNextBatch()) {
-      Float8Vector vector = (Float8Vector) root.getVector(0);
-      for (int i = 0; i < root.getRowCount(); i += 1) {
-        logger.info("value {}={}", i, vector.getValueAsDouble(i));
-      }
+import java.io.IOException;
+
+public class ExampleMain {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExampleMain.class);
+
+    public static void main(String[] args) throws Exception {
+        try (SessionContext sessionContext = SessionContexts.create(); BufferAllocator allocator = new RootAllocator()) {
+            DataFrame dataFrame = sessionContext.sql("select 1.5 + sqrt(2.0)").get();
+            dataFrame.collect(allocator).thenAccept(ExampleMain::onReaderResult).get();
+        }
     }
-    // close to release resource
-    reader.close();
-  } catch (IOException e) {
-    logger.warn("got IO Exception", e);
-  }
+
+    private static void onReaderResult(ArrowReader reader) {
+        try {
+            VectorSchemaRoot root = reader.getVectorSchemaRoot();
+            while (reader.loadNextBatch()) {
+                Float8Vector vector = (Float8Vector) root.getVector(0);
+                for (int i = 0; i < root.getRowCount(); i += 1) {
+                    logger.info("value {}={}", i, vector.getValueAsDouble(i));
+                }
+            }
+            // close to release resource
+            reader.close();
+        } catch (IOException e) {
+            logger.warn("got IO Exception", e);
+        }
+    }
 }
-// } /* end of ExampleMain */
 ```
 
 To build the library:
@@ -254,5 +250,5 @@ To build the library:
 ./gradlew build
 ```
 
-[1]: https://github.com/apache/arrow-datafusion
+[1]: https://github.com/apache/datafusion
 [2]: https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/
