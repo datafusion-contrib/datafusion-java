@@ -4,7 +4,7 @@
 [![Release](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml/badge.svg)](https://github.com/datafusion-contrib/datafusion-java/actions/workflows/release.yml)
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.maven.apache.org%2Fmaven2%2Fio%2Fgithub%2Fdatafusion-contrib%2Fdatafusion-java%2Fmaven-metadata.xml)](https://repo.maven.apache.org/maven2/io/github/datafusion-contrib/datafusion-java/)
 
-A Java binding to [Apache Arrow DataFusion][1]
+A Java binding to [Apache DataFusion][1]
 
 ## Status
 
