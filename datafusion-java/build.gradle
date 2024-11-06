@@ -75,6 +75,10 @@ tasks.register('copyDevLibrary', Sync) {
     dependsOn cargoDevBuild
 }
 
+tasks.named("test") {
+    dependsOn copyDevLibrary
+}
+
 tasks.register('copyBuiltLibrary', Copy) {
     def extension = extensionMapping[osdetector.os]
     from "${rootDir}/datafusion-jni/target/release/libdatafusion_jni.$extension"
