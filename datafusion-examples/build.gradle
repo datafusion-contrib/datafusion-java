@@ -12,7 +12,7 @@ spotless {
 
 dependencies {
     implementation project(':datafusion-java')
-    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation 'org.slf4j:slf4j-api:2.0.16'
     implementation 'ch.qos.logback:logback-classic:1.5.12'
     implementation 'org.apache.arrow:arrow-format:18.0.0'
     implementation 'org.apache.arrow:arrow-vector:14.0.0'
