@@ -9,10 +9,10 @@ plugins {
 
 dependencies {
     api 'org.slf4j:slf4j-api:2.0.16'
-    api 'org.apache.arrow:arrow-format:18.0.0'
+    api 'org.apache.arrow:arrow-format:19.0.0'
     api 'org.apache.arrow:arrow-vector:18.1.0'
     implementation 'org.apache.arrow:arrow-c-data:18.1.0'
-    runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:18.0.0'
+    runtimeOnly 'org.apache.arrow:arrow-memory-unsafe:19.0.0'
     testImplementation 'org.apache.arrow:arrow-compression:14.0.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.apache.hadoop:hadoop-client:3.4.1'
